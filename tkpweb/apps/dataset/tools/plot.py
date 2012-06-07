@@ -5,6 +5,7 @@ import datetime
 import time
 import numpy
 import aplpy
+import pyfits
 from scipy.stats import scoreatpercentile
 import matplotlib
 from matplotlib.figure import Figure
