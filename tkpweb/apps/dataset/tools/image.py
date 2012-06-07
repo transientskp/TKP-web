@@ -14,12 +14,12 @@ def open_image(url, database=None):
         try:
             if os.path.isdir(url):
                 # Likely a CASA image
-                image = accessors.CASAImage(url)
+                image = CASAImage(url)
             elif os.path.exists(url):
-                image = accessors.FITSImage(url)
+                image = FITSImage(url)
             elif MONGODB["enabled"]:
                 hdu = fetch_hdu_from_mongo(url)
-                image = accessors.FITSImage(hdu)
+                image = FITSImage(hdu)
             else:
                 raise Exception("FITS file not available")
         except Exception, e:
