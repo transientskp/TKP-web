@@ -13,7 +13,6 @@ from matplotlib.backends.backend_agg import FigureCanvasAgg
 from matplotlib.patches import Rectangle
 from matplotlib.collections import PatchCollection
 from tkp.utility import accessors
-from .image import open_image
 import dbase
 
 from tkpweb.settings import MONGODB
@@ -106,7 +105,7 @@ class ThumbnailPlot(Plot):
                 hdu = fetch_hdu_from_mongo(filename)
                 image = accessors.FITSImage(hdu)
             else:
-                raise Exception("FITS file not available")
+                raise Exception("Image file not available")
         except Exception, e:
             # Unable to access file
             print e
