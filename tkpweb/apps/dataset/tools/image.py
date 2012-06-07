@@ -31,11 +31,11 @@ def open_image(url, database=None):
     if isinstance(url, DataAccessor):
         image = url
     elif isinstance(url, basestring):
-        image = get_file_by_type(url)
+        image = get_file_by_url(url)
     elif isinstance(url, (int, long)):
         db = database if database else DataBase()
         url = Image(id=url, database=database).url
-        image = get_file_by_type(url)
+        image = get_file_by_url(url)
     else:
-        raise ValueError("unable to fetch type")
+        raise ValueError("unable to fetch url")
     return image
