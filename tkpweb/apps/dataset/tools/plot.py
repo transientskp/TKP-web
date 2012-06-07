@@ -14,6 +14,9 @@ from tkp.utility import accessors
 from .image import open_image
 import dbase
 
+from tkpweb.settings import MONGODB
+if MONGODB["enabled"]:
+    from .mongo import fetch_hdu_from_mongo
 
 class Plot(object):
 
@@ -63,11 +66,18 @@ class ImagePlot(Plot):
 
     def plot(self, dbimage, scale=0.9, plotsources=None, database=None):
         try:
-            image = aplpy.FITSFigure(dbimage['url'], figure=self.figure, auto_refresh=False)
-        except IOError:
-            # Thrown if file doesn't exist.
-            # We'll end up with an empty image.
+            if os.path.exists(dbimage['url']):
+                hdu = pyfits.open(dbimage['url'], readonly=True)
+            elif MONGODB["enabled"]:
+                hdu = fetch_hdu_from_mongo(dbimage['url'])
+            else:
+                raise Exception("FITS file not available")
+        except:
+            # Unable to access file
             return
+
+        image = aplpy.FITSFigure(hdu, figure=self.figure, auto_refresh=False)
+
         image.show_grayscale()
         image.tick_labels.set_font(size=5)
         if plotsources:
