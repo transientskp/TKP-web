@@ -1,3 +1,4 @@
+import os.path
 import StringIO
 import base64
 import datetime
@@ -72,8 +73,9 @@ class ImagePlot(Plot):
                 hdu = fetch_hdu_from_mongo(dbimage['url'])
             else:
                 raise Exception("FITS file not available")
-        except:
+        except Exception, e:
             # Unable to access file
+            print e
             return
 
         image = aplpy.FITSFigure(hdu, figure=self.figure, auto_refresh=False)
