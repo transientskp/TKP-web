@@ -97,13 +97,21 @@ class ThumbnailPlot(Plot):
     def plot(self, filename, position, boxsize=(40, 40)):
         # Guess the file format from the extension
         try:
-            if filename.lower().endswith(".fits"):
-                image = accessors.FITSImage(filename)
-            else:  # CASA does not really have default extensions
+            if os.path.isdir(filename):
+                # Likely a CASA image
                 image = accessors.CASAImage(filename)
-        except IOError:
-            # File doesn't exist; return nothing
+            elif os.path.exists(filename):
+                image = accessors.FITSImage(filename)
+            elif MONGODB["enabled"]:
+                hdu = fetch_hdu_from_mongo(filename)
+                image = accessors.FITSImage(hdu)
+            else:
+                raise Exception("FITS file not available")
+        except Exception, e:
+            # Unable to access file
+            print e
             return
+
         # Convert the input coordinates to the pixel coordinates
         x, y = image.wcs.s2p(position)
         box = ((x-boxsize[0], x+boxsize[0]), (y-boxsize[0], y+boxsize[1]))
