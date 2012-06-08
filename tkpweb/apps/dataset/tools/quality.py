@@ -32,6 +32,7 @@ FROM (SELECT ex.image_id
        WHERE ex.image_id = im.imageid
          AND im.ds_id = rc.ds_id
          AND rc.ds_id = %s
+         AND rc.xtrsrc_id = ex.xtrsrcid
       ) t
 WHERE centr_img_dist_deg < %s
 ORDER BY centr_img_dist_deg
