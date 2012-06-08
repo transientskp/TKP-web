@@ -11,35 +11,35 @@ class DataBase(object):
     def __init__(self, dblogin=None):
         self.dblogin = dblogin
         self.db = database.DataBase(**dblogin) if dblogin else database.DataBase()
-        
+
     def dataset(self, id=None, extra_info=()):
         """Get information on one or more datasets form the database
-    
+
         Kwargs:
-    
+
             id (int or None): if None, obtain a listing of all
                 datasets. Otherwise, obtain the information for a specific
                 dataset.
-    
+
             extra_info (set of strings): if given, some extra
                 information (through other tables) is obtained from the
                 database. Each string can be one of:
-    
+
                 - ntransients: number of transients for a dataset.
-    
+
                 - nimages: number of images for a dataset.
-    
+
                 - nsources: number of unique sources for a dataset.
-    
+
                 - ntotalsources: total number of sources (found by
                   sourcefinder) for this dataset.
-    
+
                 Note that a tuple or list of strings is valid input, but
                 will be transformed into a set, to filter out double
                 strings.
-    
+
          Returns:
-    
+
             (list): A list of dicts; each list item corresponds to a
                 single database row, while each dict contains the values
                 for the columns (with the column names the keys; some
@@ -47,7 +47,7 @@ class DataBase(object):
                 key). For a single dataset, the returned value is a
                 single-element list.
         """
-    
+
         extra_info = set(extra_info)
         if id is not None:  # id = 0 could be valid for some databases
             self.db.execute("""SELECT * FROM datasets WHERE dsid = %s""", id)
@@ -88,33 +88,33 @@ WHERE ex.image_id = im.imageid and im.ds_id = %s"""
                 datasets[-1]['ntotalsources'] = self.db.getone(
                     query, datasets[-1]['id'])[0]
         return datasets
-    
-    
+
+
     def image(self, id=None, dataset=None, extra_info=()):
         """Get information on one or more datasets form the database
-    
+
         Kwargs:
-    
+
             id (int or None): if None, obtain a listing of all applicable
                 images. Otherwise, obtain the information for a specific
                 dataset.
-    
+
             dataset (int or None): limit image(s) to given dataset, if
                 any.
-            
+
             extra_info (set of strings): if given, some extra
                 information (through other tables) is obtained from the
                 database. Each string can be one of:
-    
+
                 - ntotalsources: total number of sources (found by
                   sourcefinder) for this image.
-    
+
                 Note that a tuple or list of strings is valid input, but
                 will be transformed into a set, to filter out double
                 strings.
-    
+
          Returns:
-    
+
             (list): A list of dicts; each list item corresponds to a
                 single database row, while each dict contains the values
                 for the columns (with the column names the keys; some
@@ -122,7 +122,7 @@ WHERE ex.image_id = im.imageid and im.ds_id = %s"""
                 key). For a single image, the returned value is a
                 single-element list.
         """
-    
+
         extra_info = set(extra_info)
         if id is not None:  # id = 0 could be valid for some databases
             if dataset is not None:
@@ -152,35 +152,35 @@ SELECT * FROM images WHERE dsid = %s""", id)
                 images[-1][key2] = images[-1][key1]
             # Open image to obtain phase center
             img = open_image(images[-1]['url'], database=self.db)
-            header = img.get_header()
             try:
+                header = img.get_header()
                 images[-1]['ra'] = header['phasera']
                 images[-1]['dec'] = header['phasedec']
-            except KeyError:
+            except (KeyError, AttributeError):
                 images[-1]['ra'] = None
-                images[-1]['Dec'] = None
+                images[-1]['dec'] = None
             if 'ntotalsources' in extra_info:
                 query = """\
 SELECT COUNT(*) FROM extractedsources WHERE image_id = %s"""
                 images[-1]['ntotalsources'] = self.db.getone(
                     query, images[-1]['id'])[0]
         return images
-    
-    
+
+
     def transient(self, id=None, dataset=None):
         """Get information on one or more datasets form the database
-    
+
         Kwargs:
-    
+
             id (int or None): if None, obtain a listing of all applicable
                 images. Otherwise, obtain the information for a specific
                 dataset.
-    
+
             dataset (int or None): limit image(s) to given dataset, if
                 any.
-            
+
          Returns:
-    
+
             (list): A list of dicts; each list item corresponds to a
                 single database row, while each dict contains the values
                 for the columns (with the column names the keys; some
@@ -188,7 +188,7 @@ SELECT COUNT(*) FROM extractedsources WHERE image_id = %s"""
                 key). For a single image, the returned value is a
                 single-element list.
         """
-    
+
         if id is not None:  # id = 0 could be valid for some databases
             if dataset is not None:
                 self.db.execute("""\
@@ -228,25 +228,25 @@ SELECT COUNT(*) FROM extractedsources WHERE image_id = %s"""
             transients[-1]['siglevel'] = chisqprob(
                 transients[-1]['siglevel'] * n, n)
         return transients
-    
-    
+
+
     def source(self, id=None, dataset=None):
         """Get information on one or sources from the database
-    
+
         The sources obtained are those in the runningcatalog; these are the
         unique (= with associations) sources.
-        
+
         Kwargs:
-    
+
             id (int or None): if None, obtain a listing of all applicable
                 sources. Otherwise, obtain the information for a specific
                 dataset.
-    
+
             dataset (int or None): limit image(s) to given dataset, if
                 any.
-            
+
          Returns:
-    
+
             (list): A list of dicts; each list item corresponds to a
                 single database row, while each dict contains the values
                 for the columns (with the column names the keys; some
@@ -254,7 +254,7 @@ SELECT COUNT(*) FROM extractedsources WHERE image_id = %s"""
                 key). For a single image, the returned value is a
                 single-element list.
         """
-    
+
         if id is not None:  # id = 0 could be valid for some databases
             if dataset is not None:
                 self.db.execute("""
@@ -282,45 +282,45 @@ SELECT COUNT(*) FROM extractedsources WHERE image_id = %s"""
                 ['id', 'dataset']):
                 sources[-1][key2] = sources[-1][key1]
         return sources
-    
-    
+
+
     def extractedsource(self, id=None, dataset=None, image=None):
         """Get information on one or more extractedsources from the
         database
-    
+
         Kwargs:
-    
+
             id (int or None): if None, obtain a listing of all applicable
                 sources. Otherwise, obtain the information for a specific
                 dataset.
-    
+
             dataset (int or None): limit image(s) to given dataset, if
                 any.
-    
+
             image (int or None): limit sources to given image. If the
                 image is not in the dataset, an empty list will be
                 returned.
-            
+
          Returns:
-    
+
             (list): A list of dicts; each list item corresponds to a
                 single database row, while each dict contains the values
                 for the columns (with the column names the keys; some
                 column values are available twice, with a different
                 key). For a single image, the returned value is a
                 single-element list.
-                
+
             Note important keys:
             'id' : extracted source id
             'assoc_id' : Unique id for associated source.
             'image': if of image from which source extracted
         """
-    
+
         if id is not None:  # id = 0 could be valid for some databases
             if dataset is not None:
                 if image is not None:
                     self.db.execute("""
-    SELECT ex.*, im.*, ax.xtrsrc_id 
+    SELECT ex.*, im.*, ax.xtrsrc_id
     FROM extractedsources ex, images im, assocxtrsources ax
     WHERE ex.xtrsrcid = %s AND ex.image_id = im.imageid AND
     im.ds_id = %s and ex.image_id = %s
@@ -328,7 +328,7 @@ SELECT COUNT(*) FROM extractedsources WHERE image_id = %s"""
     """, id, dataset, image)
                 else:
                     self.db.execute("""
-    SELECT ex.*, im.*, ax.xtrsrc_id 
+    SELECT ex.*, im.*, ax.xtrsrc_id
     FROM extractedsources ex, images im, assocxtrsources ax
     WHERE ex.xtrsrcid = %s AND ex.image_id = im.imageid AND
     im.ds_id = %s
@@ -353,7 +353,7 @@ SELECT COUNT(*) FROM extractedsources WHERE image_id = %s"""
             if dataset is not None:
                 if image is not None:
                     self.db.execute("""\
-    SELECT ex.*, im.*, ax.xtrsrc_id 
+    SELECT ex.*, im.*, ax.xtrsrc_id
     FROM extractedsources ex, images im, assocxtrsources ax
     WHERE ex.image_id = im.imageid AND im.ds_id = %s
     AND ex.image_id = %s
@@ -361,7 +361,7 @@ SELECT COUNT(*) FROM extractedsources WHERE image_id = %s"""
     """, dataset, image)
                 else:
                     self.db.execute("""\
-    SELECT ex.*, im.*, ax.xtrsrc_id 
+    SELECT ex.*, im.*, ax.xtrsrc_id
     FROM extractedsources ex, images im, assocxtrsources ax
     WHERE ex.image_id = im.imageid AND im.ds_id = %s
     AND ax.assoc_xtrsrc_id = ex.xtrsrcid
@@ -369,14 +369,14 @@ SELECT COUNT(*) FROM extractedsources WHERE image_id = %s"""
             else:#id is none, dataset is none
                 if image is not None:
                     self.db.execute("""\
-    SELECT ex.*, ax.xtrsrc_id 
+    SELECT ex.*, ax.xtrsrc_id
     FROM extractedsources ex, assocxtrsources ax
     WHERE ex.image_id = %s
     AND ax.assoc_xtrsrc_id = ex.xtrsrcid
     """, image)
                 else:
                     self.db.execute("""\
-    SELECT ex.*, ax.xtrsrc_id 
+    SELECT ex.*, ax.xtrsrc_id
     FROM extractedsources ex, assocxtrsources ax
     WHERE ax.assoc_xtrsrc_id = ex.xtrsrcid
     """)
@@ -395,13 +395,13 @@ SELECT COUNT(*) FROM extractedsources WHERE image_id = %s"""
             #sources[-1]['flux'] = {'peak': {}, 'int': {}}
             #    for fluxtype in ('peak', 'int'):
             #        sources[-1]['flux'][fluxtype].append(
-            #            {'stokes': stokes, 
+            #            {'stokes': stokes,
             #             'value': sources[-1][stokes+"_"+fluxtype],
             #             'error': sources[-1][stokes+"_"+fluxtype+"_err"]}
             #            )
         return sources
-    
-    
+
+
     def monitoringlist(self, dataset):
         # Get all user defined entries
         query = """\
@@ -437,7 +437,7 @@ WHERE ml.userentry = false AND ml.xtrsrc_id = rc.xtrsrc_id AND rc.ds_id = %s"""
                 ['id', 'dataset', 'ra', 'decl']):
                 sources[-1][key2] = sources[-1][key1]
         return sources
-    
+
     def update_monitoringlist(self, ra, dec, ds_id):
         query = """\
 INSERT INTO monitoringlist
@@ -445,13 +445,13 @@ INSERT INTO monitoringlist
 VALUES (-1, %s, %s, %s, TRUE)"""
         self.db.execute(query, ra, dec, ds_id)
         self.db.commit()
-    
+
     def delete_monitoringlist(self, sources):
         for source in sources:
             self.db.execute(
                 "DELETE FROM monitoringlist WHERE monitorid = %s", source)
             self.db.commit()
-        
+
     def lightcurve(self, srcid):
         lc = ExtractedSource(id=srcid, database=self.db).lightcurve()
         return lc
@@ -471,7 +471,7 @@ VALUES (-1, %s, %s, %s, TRUE)"""
 
         Returns ra, dec and image filename
         """
-        
+
         ra, dec, filename = self.db.getone("""\
 SELECT ex.ra, ex.decl, im.url
 FROM extractedsources ex, images im

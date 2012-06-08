@@ -21,7 +21,7 @@ class Plot(object):
         self.size = size
         self.response = response
         self.image = None
-        
+
     def pre(self):
         """Hook for any preprocessing"""
         pass
@@ -29,7 +29,7 @@ class Plot(object):
     def post(self):
         """Hook for any postprocessing"""
         pass
-    
+
     def setup(self):
         self.figure = Figure(figsize=self.size)
         self.canvas = FigureCanvasAgg(self.figure)
@@ -44,7 +44,7 @@ class Plot(object):
         encoded_png.write('data:image/%s;base64,\n' % format)
         encoded_png.write(base64.b64encode(memfig.getvalue()))
         self.image = encoded_png.getvalue()
-    
+
     def render(self, *args, **kwargs):
         format = kwargs.pop('format', 'png')
         self.pre()
@@ -62,7 +62,12 @@ class Plot(object):
 class ImagePlot(Plot):
 
     def plot(self, dbimage, scale=0.9, plotsources=None, database=None):
-        image = aplpy.FITSFigure(dbimage['url'], figure=self.figure, auto_refresh=False)
+        try:
+            image = aplpy.FITSFigure(dbimage['url'], figure=self.figure, auto_refresh=False)
+        except IOError:
+            # Thrown if file doesn't exist.
+            # We'll end up with an empty image.
+            return
         image.show_grayscale()
         image.tick_labels.set_font(size=5)
         if plotsources:
@@ -78,10 +83,14 @@ class ThumbnailPlot(Plot):
 
     def plot(self, filename, position, boxsize=(40, 40)):
         # Guess the file format from the extension
-        if filename.lower().endswith(".fits"):
-            image = accessors.FITSImage(filename)
-        else:  # CASA does not really have default extensions
-            image = accessors.CASAImage(filename)
+        try:
+            if filename.lower().endswith(".fits"):
+                image = accessors.FITSImage(filename)
+            else:  # CASA does not really have default extensions
+                image = accessors.CASAImage(filename)
+        except IOError:
+            # File doesn't exist; return nothing
+            return
         # Convert the input coordinates to the pixel coordinates
         x, y = image.wcs.s2p(position)
         box = ((x-boxsize[0], x+boxsize[0]), (y-boxsize[0], y+boxsize[1]))
@@ -91,7 +100,7 @@ class ThumbnailPlot(Plot):
         axes.get_yaxis().set_visible(False)
         axes.imshow(thumbnail)
         self.figure.subplots_adjust(bottom=0, left=0, top=1, right=1)
-        
+
 
 class LightcurvePlot(Plot):
 

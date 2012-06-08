@@ -33,7 +33,7 @@ class BaseView(TemplateView):
             return self.database
         except AttributeError:
             return dbase.DataBase(dblogin=dblogin)
-            
+
 
 class DatasetsView(BaseView):
     template_name = "dataset/datasets.html"
@@ -59,7 +59,7 @@ class DatasetView(BaseView):
         if not dataset:
             raise Http404
         else:
-            dataset = dataset[0]            
+            dataset = dataset[0]
         context['dataset'] = dataset
         context['rmsplot'] = quality.plot_rms_distance_from_fieldcentre(
             self.database, dsid)
@@ -69,8 +69,8 @@ class DatasetView(BaseView):
             self.database, dsid)
 
         return context
-    
-    
+
+
 class ImagesView(BaseView):
     template_name = "dataset/images.html"
 
@@ -85,7 +85,7 @@ class ImageView(BaseView):
     template_name = "dataset/image.html"
 
     def get_context_data(self, **kwargs):
-        context = super(ImageView, self).get_context_data(**kwargs)        
+        context = super(ImageView, self).get_context_data(**kwargs)
         image = self.database.image(id=kwargs['id'], dataset=kwargs['dataset'], extra_info=['ntotalsources'])
         if not image:
             raise Http404
@@ -94,8 +94,8 @@ class ImageView(BaseView):
         image['png'] = plot.ImagePlot().render(image, database=self.database)
         dataset = self.database.dataset(id=kwargs['dataset'])[0]
         extractedsources = self.database.extractedsource(image=image['id'])
-        
-            
+
+
         image['extractedsources'] = plot.ImagePlot().render(image, plotsources=extractedsources)
         context['image'] = image
         context['extractedsources'] = extractedsources
@@ -206,7 +206,7 @@ class MonitoringListView(BaseView, FormMixin):
     template_name = 'dataset/monitoringlist.html'
     form_class = MonitoringListForm
     initial = {}
-    
+
     def form_valid(self, form):
         self.database.update_monitoringlist(
             form.cleaned_data['ra'], form.cleaned_data['dec'], self.dataset_id)
@@ -214,7 +214,7 @@ class MonitoringListView(BaseView, FormMixin):
 
     def form_invalid(self, form):
         return HttpResponseRedirect(self.get_succes_url())
-    
+
     def get_succes_url(self):
         return reverse('dataset:monitoringlist',
                        kwargs={'dataset': self.dataset_id})
@@ -226,7 +226,7 @@ class MonitoringListView(BaseView, FormMixin):
         form = self.get_form(form_class)
         return self.render_to_response(
             self.get_context_data(form=form, **kwargs))
-    
+
     def post(self, request, *args, **kwargs):
         if not self.request.user.has_perm('monitoringlist.change_monitoringlist'):
             return HttpResponseForbidden()
@@ -236,14 +236,14 @@ class MonitoringListView(BaseView, FormMixin):
             sources = [int(source) for source in
                        request.POST.getlist('sources', [])]
             self.database.delete_monitoringlist(sources)
-            return HttpResponseRedirect(self.get_succes_url())            
+            return HttpResponseRedirect(self.get_succes_url())
         form_class = self.get_form_class()
         form = self.get_form(form_class)
         if form.is_valid():
             return self.form_valid(form)
         else:
             return self.form_invalid(form)
-        
+
     def get_context_data(self, **kwargs):
         context = super(MonitoringListView, self).get_context_data(**kwargs)
         context['sources'] = self.database.monitoringlist(dataset=kwargs['dataset'])
@@ -264,7 +264,7 @@ class TransientLightcurveView(BaseView):
         context['transient'] = transient
         context['id'] = transient['xtrsrc_id']
         return context
-    
+
     def render_to_response(self, context, **kwargs):
         response = HttpResponse(mimetype="image/png")
         plot.LightcurvePlot(response=response).render(
@@ -278,7 +278,7 @@ class SourceLightcurveView(BaseView):
         context = super(SourceLightcurveView, self).get_context_data(**kwargs)
         context['id'] = kwargs['id']
         return context
-    
+
     def render_to_response(self, context, **kwargs):
         response = HttpResponse(mimetype="image/png")
         plot.LightcurvePlot(response=response).render(
