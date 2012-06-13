@@ -5,14 +5,20 @@
 
 <h2>Properties</h2>
 
-<dl>
-  <dt>description</dt>
-  <dd>{{ dataset.description }}</dd>
-  <dt>Reprocessing step</dt>
-  <dd>{{ dataset.rerun }}</dd>
-  <dt>processing finished</dt>
-  <dd>{{ dataset.process_ts|date:"c" }}</dd>
-</dl>
+<table class="properties">
+  <tr>
+    <th>Description</th>
+    <td>{{ dataset.description }}</td>
+  </tr>
+  <tr>
+    <th>Reprocessing step</th>
+    <td>{{ dataset.rerun }}</td>
+  </tr>
+  <tr>
+    <th>Processing finished</th>
+    <td>{{ dataset.process_ts|date:"c" }}</td>
+  </tr>
+</table>
 
 <h2>Details</h2>
 

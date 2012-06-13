@@ -6,22 +6,36 @@
 
 <h2>Properties</h2>
 
-<dl>
-  <dt>Position</dt>
-  <dd>({{ extractedsource.ra|stringformat:".3f" }}&deg;, {{ extractedsource.decl|stringformat:".3f" }}&deg;) &pm; ({{ extractedsource.ra_err|stringformat:".3f" }}&Prime;, {{ extractedsource.decl_err|stringformat:".3f" }}&Prime;)</dd>
-  <dt>Signal to noise</dt>
-  <dd>{{ extractedsource.det_sigma|stringformat:".3f" }}</dd>
-  <dt>Peak flux (mJy)</dt>
-  <dd>{{ extractedsource.i_peak|prefixformat:"m"|stringformat:".3f" }} &pm; {{ extractedsource.i_peak_err|prefixformat:"m"|stringformat:".3f" }}</dd>
-  <dt>Integrated flux (mJy)</dt>
-  <dd>{{ extractedsource.i_int|prefixformat:"m"|stringformat:".3f" }} &pm; {{ extractedsource.i_int_err|prefixformat:"m"|stringformat:".3f" }}</dd>
-  <dt>Dataset</dt>
-  <dd><a href="{% url 'dataset:dataset' id=dataset.id %}">{{ dataset.id }}</a></dd>
-  <dt>Image</dt>
-  <dd><a href="{% url 'dataset:image' dataset=dataset.id id=extractedsource.image %}">{{ extractedsource.image }}</a></dd>
-  <dt>Associated Source</dt>
-  <dd><a href="{% url 'dataset:source' dataset=dataset.id id=extractedsource.assoc_id %}">{{ extractedsource.assoc_id }}</a></dd>
-</dl>
+<table class="properties">
+  <tr>
+    <th>Position</th>
+    <td>({{ extractedsource.ra|stringformat:".3f" }}&deg;, {{ extractedsource.decl|stringformat:".3f" }}&deg;) &pm; ({{ extractedsource.ra_err|stringformat:".3f" }}&Prime;, {{ extractedsource.decl_err|stringformat:".3f" }}&Prime;)</td>
+  </tr>
+  <tr>
+    <th>Signal to noise</th>
+    <td>{{ extractedsource.det_sigma|stringformat:".3f" }}</td>
+  </tr>
+  <tr>
+    <th>Peak flux (mJy)</th>
+    <td>{{ extractedsource.i_peak|prefixformat:"m"|stringformat:".3f" }} &pm; {{ extractedsource.i_peak_err|prefixformat:"m"|stringformat:".3f" }}</td>
+  </tr>
+  <tr>
+    <th>Integrated flux (mJy)</th>
+    <td>{{ extractedsource.i_int|prefixformat:"m"|stringformat:".3f" }} &pm; {{ extractedsource.i_int_err|prefixformat:"m"|stringformat:".3f" }}</td>
+  </tr>
+  <tr>
+    <th>Dataset</th>
+    <td><a href="{% url 'dataset:dataset' id=dataset.id %}">{{ dataset.id }}</a></td>
+  </tr>
+  <tr>
+    <th>Image</th>
+    <td><a href="{% url 'dataset:image' dataset=dataset.id id=extractedsource.image %}">{{ extractedsource.image }}</a></td>
+  </tr>
+  <tr>
+    <th>Associated Source</th>
+    <td><a href="{% url 'dataset:source' dataset=dataset.id id=extractedsource.assoc_id %}">{{ extractedsource.assoc_id }}</a></td>
+  </tr>
+</table>
 <!--
 -->
 {% endblock main %}
