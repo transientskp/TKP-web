@@ -181,7 +181,7 @@ MONETDB_LOGIN = {}
 
 # Configuration for MongoDB image store
 MONGODB = {
-    "enabled": True,
+    "enabled": False,
     "host": "pc-swinbank.science.uva.nl",
     "port": 27017,
     "database": "tkp"
