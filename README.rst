@@ -35,10 +35,13 @@ the following steps:
 
 
 - edit tkpweb/settings.py:
-  
+
   - verify that you're happy with the default database settings
 
   - edit the `SECRET_KEY`.
+
+  - if required, enable the MongoDB image store and enter the details of your
+    MongoDB database.
 
 - edit tkpweb/apps/database/views.py:
 
@@ -62,7 +65,7 @@ the following steps:
 
 - Convert the \*scss files in the static directories to css files,
   using sass ::
-  
+
     sass base.scss:base.css
 
 - Collect the static files ::
@@ -99,6 +102,9 @@ Dependencies
 
 - Sass, to convert the scss files to CSS files.
   See http://sass-lang.com/
+
+- (Optionally) PyMongo (including GridFS) to fetch images from a MongoDB
+  databse: https://github.com/mongodb/mongo-python-driver
 
 
 License
