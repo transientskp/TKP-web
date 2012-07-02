@@ -321,64 +321,73 @@ SELECT COUNT(*) FROM extractedsources WHERE image_id = %s"""
                 if image is not None:
                     self.db.execute("""
     SELECT ex.*, im.*, ax.xtrsrc_id
-    FROM extractedsources ex, images im, assocxtrsources ax
+    FROM 
+        extractedsources ex LEFT JOIN assocxtrsources ax 
+                    on ex.xtrsrcid = ax.assoc_xtrsrc_id , 
+        images im
     WHERE ex.xtrsrcid = %s AND ex.image_id = im.imageid AND
     im.ds_id = %s and ex.image_id = %s
-    AND ax.assoc_xtrsrc_id = ex.xtrsrcid
     """, id, dataset, image)
                 else:
                     self.db.execute("""
     SELECT ex.*, im.*, ax.xtrsrc_id
-    FROM extractedsources ex, images im, assocxtrsources ax
+    FROM 
+        extractedsources ex LEFT JOIN assocxtrsources ax 
+                    on ex.xtrsrcid = ax.assoc_xtrsrc_id ,  
+        images im, assocxtrsources ax
     WHERE ex.xtrsrcid = %s AND ex.image_id = im.imageid AND
     im.ds_id = %s
-    AND ax.assoc_xtrsrc_id = ex.xtrsrcid
     """, id, dataset)
             else: #id is not none, dataset is none
                 if image is not None:
                     self.db.execute("""\
     SELECT ex.*, ax.xtrsrc_id
-    FROM extractedsources ex, assocxtrsources ax
+    FROM extractedsources ex LEFT JOIN assocxtrsources ax 
+                    on ex.xtrsrcid = ax.assoc_xtrsrc_id ,  
     WHERE ex.xtrsrcid = %s
     AND ex.image_id = %s
-    AND ax.assoc_xtrsrc_id = ex.xtrsrcid""", id, image)
+    """, id, image)
                 else:
                     self.db.execute("""\
     SELECT ex.*, ax.xtrsrc_id
-    FROM extractedsources ex, assocxtrsources ax
+    FROM extractedsources ex LEFT JOIN assocxtrsources ax 
+                    on ex.xtrsrcid = ax.assoc_xtrsrc_id ,  
     WHERE ex.xtrsrcid = %s
-    AND ax.assoc_xtrsrc_id = ex.xtrsrcid
     """, id)
         else: #id is None
             if dataset is not None:
                 if image is not None:
                     self.db.execute("""\
     SELECT ex.*, im.*, ax.xtrsrc_id
-    FROM extractedsources ex, images im, assocxtrsources ax
+    FROM 
+        extractedsources ex LEFT JOIN assocxtrsources ax 
+                    on ex.xtrsrcid = ax.assoc_xtrsrc_id , 
+        images im
     WHERE ex.image_id = im.imageid AND im.ds_id = %s
     AND ex.image_id = %s
-    AND ax.assoc_xtrsrc_id = ex.xtrsrcid
     """, dataset, image)
                 else:
                     self.db.execute("""\
     SELECT ex.*, im.*, ax.xtrsrc_id
-    FROM extractedsources ex, images im, assocxtrsources ax
+    FROM 
+        extractedsources ex LEFT JOIN assocxtrsources ax 
+                    on ex.xtrsrcid = ax.assoc_xtrsrc_id , 
+        images im
     WHERE ex.image_id = im.imageid AND im.ds_id = %s
-    AND ax.assoc_xtrsrc_id = ex.xtrsrcid
     """, dataset)
             else:#id is none, dataset is none
                 if image is not None:
                     self.db.execute("""\
     SELECT ex.*, ax.xtrsrc_id
-    FROM extractedsources ex, assocxtrsources ax
+    FROM extractedsources ex LEFT JOIN assocxtrsources ax 
+                    on ex.xtrsrcid = ax.assoc_xtrsrc_id   
     WHERE ex.image_id = %s
-    AND ax.assoc_xtrsrc_id = ex.xtrsrcid
     """, image)
-                else:
+                else: ##All none. Simply return all extracted sources.
                     self.db.execute("""\
     SELECT ex.*, ax.xtrsrc_id
-    FROM extractedsources ex, assocxtrsources ax
-    WHERE ax.assoc_xtrsrc_id = ex.xtrsrcid
+    FROM extractedsources ex LEFT JOIN assocxtrsources ax 
+                    on ex.xtrsrcid = ax.assoc_xtrsrc_id   
     """)
         description = dict(
             [(d[0], i) for i, d in enumerate(self.db.cursor.description)])
