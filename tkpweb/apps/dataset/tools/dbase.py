@@ -97,7 +97,7 @@ WHERE ex.image_id = im.imageid and im.ds_id = %s"""
 
             id (int or None): if None, obtain a listing of all applicable
                 images. Otherwise, obtain the information for a specific
-                dataset.
+                image.
 
             dataset (int or None): limit image(s) to given dataset, if
                 any.
@@ -130,7 +130,7 @@ WHERE ex.image_id = im.imageid and im.ds_id = %s"""
 SELECT * FROM images WHERE imageid = %s AND ds_id = %s""", id, dataset)
             else:
                 self.db.execute("""\
-SELECT * FROM images WHERE dsid = %s""", id)
+SELECT * FROM images WHERE imageid = %s""", id)
         else:
             if dataset is not None:
                 self.db.execute("""SELECT * FROM images WHERE ds_id = %s""", dataset)
