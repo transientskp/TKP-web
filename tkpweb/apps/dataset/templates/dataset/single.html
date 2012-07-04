@@ -5,22 +5,30 @@
 
 <h2>Properties</h2>
 
-<dl>
+<table class="properties">
 <!--
-  <dt>type</dt>
-  <dd>{{ dataset.dstype }}</dd>
+  <tr>
+    <th>type</th>
+    <td>{{ dataset.dstype }}</td>
+  </tr>
 -->
-  <dt>description</dt>
-  <dd>{{ dataset.description }}</dd>
+  <tr>
+    <th>description</th>
+    <td>{{ dataset.description }}</td>
+  </tr>
 <!--
-  <dt>out name</dt>
-  <dd>{{ dataset.dsoutname }}</dd>
+  <tr>
+    <th>out name</th>
+    <td>{{ dataset.dsoutname }}</td>
+  </tr>
 -->
-  <dt>Reprocessing step</dt>
-  <dd>{{ dataset.rerun }}</dd>
-  <dt>processing finished</dt>
-  <dd>{{ dataset.process_ts|date:"c" }}</dd>
-</dl>
+  <tr>
+    <th>Reprocessing step</th>
+    <td>{{ dataset.rerun }}</td>
+    <th>processing finished</th>
+    <td>{{ dataset.process_ts|date:"c" }}</td>
+  </tr>
+</table>
 
 <h2>Details</h2>
 

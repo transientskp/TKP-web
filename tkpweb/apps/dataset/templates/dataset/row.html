@@ -6,11 +6,13 @@
 
 <h2>Properties</h2>
 
-<dl>
+<table class="properties">
 {% for key, value in data.items %}
-  <dt>{{ key }}</dt>
-  <dd>{{ value }}</dd>
+  <tr>
+    <th>{{ key }}</th>
+    <td>{{ value }}</td>
+  </tr>
 {% endfor %}
-</dl>
+</table>
 
 {% endblock main %}
