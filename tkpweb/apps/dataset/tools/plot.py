@@ -1,9 +1,11 @@
+import os.path
 import StringIO
 import base64
 import datetime
 import time
 import numpy
 import aplpy
+import pyfits
 from scipy.stats import scoreatpercentile
 import matplotlib
 from matplotlib.figure import Figure
@@ -11,9 +13,11 @@ from matplotlib.backends.backend_agg import FigureCanvasAgg
 from matplotlib.patches import Rectangle
 from matplotlib.collections import PatchCollection
 from tkp.utility import accessors
-from .image import open_image
 import dbase
 
+from tkpweb.settings import MONGODB
+if MONGODB["enabled"]:
+    from .mongo import fetch_hdu_from_mongo
 
 class Plot(object):
 
@@ -63,11 +67,19 @@ class ImagePlot(Plot):
 
     def plot(self, dbimage, scale=0.9, plotsources=None, database=None):
         try:
-            image = aplpy.FITSFigure(dbimage['url'], figure=self.figure, auto_refresh=False)
-        except IOError:
-            # Thrown if file doesn't exist.
-            # We'll end up with an empty image.
+            if os.path.exists(dbimage['url']):
+                hdu = pyfits.open(dbimage['url'], readonly=True)
+            elif MONGODB["enabled"]:
+                hdu = fetch_hdu_from_mongo(dbimage['url'])
+            else:
+                raise Exception("FITS file not available")
+        except Exception, e:
+            # Unable to access file
+            print e
             return
+
+        image = aplpy.FITSFigure(hdu, figure=self.figure, auto_refresh=False)
+
         image.show_grayscale()
         image.tick_labels.set_font(size=5)
         if plotsources:
@@ -84,13 +96,21 @@ class ThumbnailPlot(Plot):
     def plot(self, filename, position, boxsize=(40, 40)):
         # Guess the file format from the extension
         try:
-            if filename.lower().endswith(".fits"):
-                image = accessors.FITSImage(filename)
-            else:  # CASA does not really have default extensions
+            if os.path.isdir(filename):
+                # Likely a CASA image
                 image = accessors.CASAImage(filename)
-        except IOError:
-            # File doesn't exist; return nothing
+            elif os.path.exists(filename):
+                image = accessors.FITSImage(filename)
+            elif MONGODB["enabled"]:
+                hdu = fetch_hdu_from_mongo(filename)
+                image = accessors.FITSImage(hdu)
+            else:
+                raise Exception("Image file not available")
+        except Exception, e:
+            # Unable to access file
+            print e
             return
+
         # Convert the input coordinates to the pixel coordinates
         x, y = image.wcs.s2p(position)
         box = ((x-boxsize[0], x+boxsize[0]), (y-boxsize[0], y+boxsize[1]))
