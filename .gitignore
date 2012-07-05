@@ -5,3 +5,5 @@ tkpweb.db
 tkp.cfg
 tkpweb/apps/database/views.py
 *.pyc
+.idea
+tkpweb/static/
