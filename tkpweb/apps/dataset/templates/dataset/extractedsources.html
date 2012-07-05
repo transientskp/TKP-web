@@ -23,7 +23,13 @@
 {% for extractedsource in extractedsources %}
 <tr class="{% cycle 'odd' 'even' %}">
 <td><a href="{% url 'dataset:extractedsource' dataset=dataset.id id=extractedsource.id %}">{{ extractedsource.id }}</a></td>
-<td><a href="{% url 'dataset:source' dataset=dataset.id id=extractedsource.assoc_id %}">{{ extractedsource.assoc_id }}</a></td>
+<td>
+{% if extractedsource.assoc_id %}
+	<a href="{% url 'dataset:source' dataset=dataset.id id=extractedsource.assoc_id %}">{{ extractedsource.assoc_id }}</a>
+{% else %}
+	None
+{% endif %}	</td>
+
 <td>{{ extractedsource.ra|stringformat:".3f" }}</td>
 <td> {{ extractedsource.decl|stringformat:".3f" }}</td>
 <td>{{ extractedsource.ra_err|stringformat:".3f" }}</td>

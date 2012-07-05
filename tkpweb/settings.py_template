@@ -178,3 +178,11 @@ LOGGING = {
 
 LOGIN_URL = '/account/login/'
 MONETDB_LOGIN = {}
+
+# Configuration for MongoDB image store
+MONGODB = {
+    "enabled": False,
+    "host": "pc-swinbank.science.uva.nl",
+    "port": 27017,
+    "database": "tkp"
+}

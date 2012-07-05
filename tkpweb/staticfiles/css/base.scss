@@ -64,7 +64,7 @@ section#main
   padding: 1ex 0.5em 5ex 1.5em;
   border-right: 1px dotted #660bab;
 }
-  
+
 h1, h2
 {
   margin-top: 0;
@@ -119,32 +119,6 @@ a:hover
 }
 
 
-dl 
-{
-  padding: 0.5em;
-
-  dt
-  {
-    float: left;
-    clear: both;
-    width: 11em;
-    text-align: right;
-    font-weight: normal;
-    color: $color-keytext1;
-    padding-bottom: 0.5em;
-
-     &:after 
-    {
-      content: ":";
-    }
-  }
-  dd 
-  {
-    margin: 0 0 0 $dt-size + 1em;
-    padding-bottom: 0.5em;
-  }
-}
-
 table
 {
   border: $table-lines;
@@ -183,7 +157,7 @@ table
     {
       border-left: none;
     }
-  
+
     &.odd
     {
       background-color: $color-tr-bg;
@@ -198,5 +172,33 @@ table
     padding: 0.2em 0.6em;
     border-left: $table-lines;
     text-align: right;
+  }
+}
+
+
+table.properties
+{
+  padding: 0.5em;
+  border: none;
+  tr
+  {
+    th
+    {
+      width: 11em;
+      text-align: right;
+      font-weight: normal;
+      color: $color-keytext1;
+
+      &:after
+      {
+        content: ":";
+      }
+    }
+    td
+    {
+      text-align: left;
+      padding: 0.2em 0.6em;
+      border: none;
+    }
   }
 }
