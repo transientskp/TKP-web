@@ -113,13 +113,23 @@ class ThumbnailPlot(Plot):
 
         # Convert the input coordinates to the pixel coordinates
         x, y = image.wcs.s2p(position)
-        box = ((x-boxsize[0], x+boxsize[0]), (y-boxsize[0], y+boxsize[1]))
+        box = (
+            (
+                x-boxsize[0] if x-boxsize[0] > 0 else 0,
+                x+boxsize[0] if x+boxsize[0] < image.data.shape[0] else image.data.shape[0] - 1
+            ),
+            (
+                y-boxsize[0] if y-boxsize[0] > 0 else 0,
+                y+boxsize[0] if y+boxsize[0] < image.data.shape[0] else image.data.shape[0] - 1
+            )
+        )
         thumbnail = image.data[box[0][0]:box[0][1],box[1][0]:box[1][1]]
         axes = self.figure.add_subplot(1, 1, 1)
         axes.get_xaxis().set_visible(False)
         axes.get_yaxis().set_visible(False)
-        axes.imshow(thumbnail)
-        self.figure.subplots_adjust(bottom=0, left=0, top=1, right=1)
+        if thumbnail.any():
+            axes.imshow(thumbnail)
+            self.figure.subplots_adjust(bottom=0, left=0, top=1, right=1)
 
 
 class LightcurvePlot(Plot):
