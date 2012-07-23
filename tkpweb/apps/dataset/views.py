@@ -167,7 +167,7 @@ class SourceView(BaseView):
         else:
             source = source[0]
         images = self.database.image_times(dataset=kwargs['dataset'])
-        lightcurve = self.database.lightcurve(int(source['xtrsrc_id']))
+        lightcurve = self.database.lightcurve(int(source['xtrsrc']))
         context['lightcurve'] = {
             'plot': plot.LightcurvePlot().render(lightcurve, images=images),
             'data': lightcurve

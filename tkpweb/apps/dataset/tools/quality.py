@@ -19,20 +19,20 @@ def plot_rms_distance_from_fieldcentre(
 
     query = """\
 SELECT *
-FROM (SELECT ex.image_id
-            ,ex.xtrsrcid as xtrsrcid1
+FROM (SELECT ex.image
+            ,ex.id as xtrsrcid1
             ,3600* DEGREES(2 * ASIN(SQRT( (ex.x - rc.x) * (ex.x - rc.x)
                                         + (ex.y - rc.y) * (ex.y - rc.y)
                                         + (ex.z - rc.z) * (ex.z - rc.z)
                                         ) / 2)) AS centr_img_dist_deg
-            ,20000 * ex.i_peak / ex.det_sigma as rms_mJy
-        FROM extractedsources ex
-            ,images im
+            ,20000 * ex.f_peak / ex.det_sigma as rms_mJy
+        FROM extractedsource ex
+            ,image im
             ,runningcatalog rc
-       WHERE ex.image_id = im.imageid
-         AND im.ds_id = rc.ds_id
-         AND rc.ds_id = %s
-         AND rc.xtrsrc_id = ex.xtrsrcid
+       WHERE ex.image = im.id
+         AND im.dataset = rc.dataset
+         AND rc.dataset = %s
+         AND rc.xtrsrc = ex.id
       ) t
 WHERE centr_img_dist_deg < %s
 ORDER BY centr_img_dist_deg
@@ -80,19 +80,19 @@ class HistSourcesPerImagePlot(Plot):
                 i += 1
 
         query = """\
-SELECT imageid
+SELECT id
       ,taustart_ts
       ,nsources
-FROM images
-    ,(SELECT x1.image_id 
+FROM image
+    ,(SELECT x1.image
             ,COUNT(*) as nsources
-      FROM extractedsources x1
-          ,images im1
-      WHERE x1.image_id = im1.imageid
-        AND ds_id = %s
-      GROUP BY x1.image_id
+      FROM extractedsource x1
+          ,image im1
+      WHERE x1.image = im1.id
+        AND dataset = %s
+      GROUP BY x1.image
      ) t1
-WHERE t1.image_id = imageid
+WHERE t1.image = id
 """
         results = zip(*database.db.get(query, dsid))
         if not results:
@@ -126,7 +126,7 @@ class ScatterPosAllCounterpartsPlot(Plot):
         """
     
         query = """\
-SELECT x.xtrsrcid
+SELECT x.id
       ,x.ra
       ,x.decl
       ,3600 * (x.ra - r.wm_ra) as ra_dist_arcsec
@@ -135,15 +135,14 @@ SELECT x.xtrsrcid
       ,x.decl_err/2 
       ,r.wm_ra_err/2
       ,r.wm_decl_err/2
-  FROM assocxtrsources a
-      ,extractedsources x 
+  FROM assocxtrsource a
+      ,extractedsource x
       ,runningcatalog r
-      ,images im1
- WHERE a.xtrsrc_id <> a.assoc_xtrsrc_id
-   AND a.xtrsrc_id = r.xtrsrc_id
-   AND a.assoc_xtrsrc_id = x.xtrsrcid
-   AND x.image_id = im1.imageid
-   AND im1.ds_id = %s
+      ,image im1
+ WHERE a.runcat = r.id
+   AND a.xtrsrc = x.id
+   AND x.image = im1.id
+   AND im1.dataset = %s
 
 """
         results = zip(*database.db.get(query, dsid))

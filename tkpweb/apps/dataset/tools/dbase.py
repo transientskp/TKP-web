@@ -50,9 +50,9 @@ class DataBase(object):
 
         extra_info = set(extra_info)
         if id is not None:  # id = 0 could be valid for some databases
-            self.db.execute("""SELECT * FROM datasets WHERE dsid = %s""", id)
+            self.db.execute("""SELECT * FROM dataset WHERE id = %s""", id)
         else:
-            self.db.execute("""SELECT * FROM datasets""")
+            self.db.execute("""SELECT * FROM dataset""")
         description = dict(
             [(d[0], i) for i, d in enumerate(self.db.cursor.description)])
         datasets = []
@@ -62,29 +62,29 @@ class DataBase(object):
                       for key, column in description.iteritems()]))
             # Format into slightly nicer keys
             for key1, key2 in zip(
-                ['dsid', 'process_ts'],
+                ['id', 'process_ts'],
                 ['id', 'processdate']):
                 datasets[-1][key2] = datasets[-1][key1]
             if 'ntransients' in extra_info:
                 query = """\
-SELECT COUNT(*) FROM transients tr, runningcatalog rc
-WHERE tr.xtrsrc_id = rc.xtrsrc_id AND rc.ds_id = %s"""
+SELECT COUNT(*) FROM transient tr, runningcatalog rc
+WHERE tr.runcat = rc.id AND rc.dataset = %s"""
                 datasets[-1]['ntransients'] = self.db.getone(
                     query, datasets[-1]['id'])[0]
             if 'nimages' in extra_info:
                 query = """\
-SELECT COUNT(*) FROM images WHERE ds_id = %s"""
+SELECT COUNT(*) FROM image WHERE id = %s"""
                 datasets[-1]['nimages'] = self.db.getone(
                     query, datasets[-1]['id'])[0]
             if 'nsources' in extra_info:
                 query = """\
-SELECT COUNT(*) FROM runningcatalog WHERE ds_id = %s"""
+SELECT COUNT(*) FROM runningcatalog WHERE dataset = %s"""
                 datasets[-1]['nsources'] = self.db.getone(
                     query, datasets[-1]['id'])[0]
             if 'ntotalsources' in extra_info:
                 query = """\
-SELECT COUNT(*) FROM extractedsources ex, images im
-WHERE ex.image_id = im.imageid and im.ds_id = %s"""
+SELECT COUNT(*) FROM extractedsource ex, image im
+WHERE ex.image = im.id and im.dataset = %s"""
                 datasets[-1]['ntotalsources'] = self.db.getone(
                     query, datasets[-1]['id'])[0]
         return datasets
@@ -127,15 +127,15 @@ WHERE ex.image_id = im.imageid and im.ds_id = %s"""
         if id is not None:  # id = 0 could be valid for some databases
             if dataset is not None:
                 self.db.execute("""\
-SELECT * FROM images WHERE imageid = %s AND ds_id = %s""", id, dataset)
+SELECT * FROM image WHERE id = %s AND dataset = %s""", id, dataset)
             else:
                 self.db.execute("""\
-SELECT * FROM images WHERE imageid = %s""", id)
+SELECT * FROM image WHERE id = %s""", id)
         else:
             if dataset is not None:
-                self.db.execute("""SELECT * FROM images WHERE ds_id = %s""", dataset)
+                self.db.execute("""SELECT * FROM image WHERE dataset = %s""", dataset)
             else:
-                self.db.execute("""SELECT * FROM images""")
+                self.db.execute("""SELECT * FROM image""")
         description = dict(
             [(d[0], i) for i, d in enumerate(self.db.cursor.description)])
         images = []
@@ -145,8 +145,8 @@ SELECT * FROM images WHERE imageid = %s""", id)
                       for key, column in description.iteritems()]))
             # Format into slightly nicer keys
             for key1, key2 in zip(
-                ['imageid', 'taustart_ts', 'tau_time', 'freq_eff', 'freq_bw',
-                 'ds_id'],
+                ['id', 'taustart_ts', 'tau_time', 'freq_eff', 'freq_bw',
+                 'dataset'],
                 ['id', 'obsstart', 'inttime', 'frequency', 'bandwidth',
                  'dataset']):
                 images[-1][key2] = images[-1][key1]
@@ -161,7 +161,7 @@ SELECT * FROM images WHERE imageid = %s""", id)
                 images[-1]['dec'] = None
             if 'ntotalsources' in extra_info:
                 query = """\
-SELECT COUNT(*) FROM extractedsources WHERE image_id = %s"""
+SELECT COUNT(*) FROM extractedsource WHERE image = %s"""
                 images[-1]['ntotalsources'] = self.db.getone(
                     query, images[-1]['id'])[0]
         return images
@@ -192,19 +192,19 @@ SELECT COUNT(*) FROM extractedsources WHERE image_id = %s"""
         if id is not None:  # id = 0 could be valid for some databases
             if dataset is not None:
                 self.db.execute("""\
-    SELECT * FROM transients tr, runningcatalog rc
-    WHERE tr.transientid = %s AND tr.xtrsrc_id = rc.xtrsrc_id AND rc.ds_id = %s""",
+    SELECT * FROM transient tr, runningcatalog rc
+    WHERE tr.id = %s AND tr.runcat = rc.id AND rc.dataset = %s""",
                            id, dataset)
             else:
                 self.db.execute("""\
-    SELECT * FROM transients WHERE transientsid = %s""", id)
+    SELECT * FROM transient WHERE id = %s""", id)
         else:
             if dataset is not None:
                 self.db.execute("""\
-    SELECT * FROM transients tr, runningcatalog rc
-    WHERE tr.xtrsrc_id = rc.xtrsrc_id AND ds_id = %s""", dataset)
+    SELECT * FROM transient tr, runningcatalog rc
+    WHERE tr.runcat = rc.id AND dataset = %s""", dataset)
             else:
-                self.db.execute("""SELECT * FROM transients""")
+                self.db.execute("""SELECT * FROM transient""")
         description = dict(
             [(d[0], i) for i, d in enumerate(self.db.cursor.description)])
         transients = []
@@ -220,8 +220,8 @@ SELECT COUNT(*) FROM extractedsources WHERE image_id = %s"""
             # Obtain the actual number of datapoints, including those from
             # sub-detection level monitoring observations
             transients[-1]['npoints'] = self.db.getone(
-                "SELECT COUNT(*) FROM assocxtrsources WHERE xtrsrc_id = %s",
-                transients[-1]['xtrsrc_id'])[0]
+                "SELECT COUNT(*) FROM assocxtrsource WHERE xtrsrc = %s",
+                transients[-1]['xtrsrc'])[0]
             # Calculate the significance level (note: here we do need rc.datapoints,
             # instead of the above npoints)
             n = transients[-1]['datapoints']
@@ -259,14 +259,14 @@ SELECT COUNT(*) FROM extractedsources WHERE image_id = %s"""
             if dataset is not None:
                 self.db.execute("""
     SELECT * FROM runningcatalog
-    WHERE xtrsrc_id = %s AND ds_id = %s""", id, dataset)
+    WHERE xtrsrc = %s AND dataset = %s""", id, dataset)
             else:
                 self.db.execute("""\
-    SELECT * FROM runningcatalog WHERE xtrsrc_id = %s""", id)
+    SELECT * FROM runningcatalog WHERE xtrsrc = %s""", id)
         else:
             if dataset is not None:
                 self.db.execute("""\
-    SELECT * FROM runningcatalog WHERE ds_id = %s""", dataset)
+    SELECT * FROM runningcatalog WHERE dataset = %s""", dataset)
             else:
                 self.db.execute("""SELECT * FROM runningcatalog""")
         description = dict(
@@ -278,7 +278,7 @@ SELECT COUNT(*) FROM extractedsources WHERE image_id = %s"""
                       for key, column in description.iteritems()]))
             # Format into somewhat nicer keys
             for key1, key2 in zip(
-                ['xtrsrc_id', 'ds_id'],
+                ['xtrsrc', 'dataset'],
                 ['id', 'dataset']):
                 sources[-1][key2] = sources[-1][key1]
         return sources
@@ -320,74 +320,74 @@ SELECT COUNT(*) FROM extractedsources WHERE image_id = %s"""
             if dataset is not None:
                 if image is not None:
                     self.db.execute("""
-    SELECT ex.*, im.*, ax.xtrsrc_id
+    SELECT ex.*, im.*, ax.xtrsrc
     FROM 
-        extractedsources ex LEFT JOIN assocxtrsources ax 
-                    on ex.xtrsrcid = ax.assoc_xtrsrc_id , 
-        images im
-    WHERE ex.xtrsrcid = %s AND ex.image_id = im.imageid AND
-    im.ds_id = %s and ex.image_id = %s
+        extractedsource ex LEFT JOIN assocxtrsource ax
+                    on ex.id = ax.xtrsrc,
+        image im
+    WHERE ex.id = %s AND ex.image = im.id AND
+    im.dataset = %s and ex.image = %s
     """, id, dataset, image)
                 else:
                     self.db.execute("""
-    SELECT ex.*, im.*, ax.xtrsrc_id
+    SELECT ex.*, im.*, ax.xtrsrc
     FROM 
-        extractedsources ex LEFT JOIN assocxtrsources ax 
-                    on ex.xtrsrcid = ax.assoc_xtrsrc_id ,  
-        images im, assocxtrsources ax
-    WHERE ex.xtrsrcid = %s AND ex.image_id = im.imageid AND
-    im.ds_id = %s
+        extractedsource ex LEFT JOIN assocxtrsource ax
+                    on ex.id = ax.xtrsrc,
+        image im, assocxtrsource ax
+    WHERE ex.id = %s AND ex.image = im.id AND
+    im.dataset = %s
     """, id, dataset)
             else: #id is not none, dataset is none
                 if image is not None:
                     self.db.execute("""\
-    SELECT ex.*, ax.xtrsrc_id
-    FROM extractedsources ex LEFT JOIN assocxtrsources ax 
-                    on ex.xtrsrcid = ax.assoc_xtrsrc_id ,  
-    WHERE ex.xtrsrcid = %s
-    AND ex.image_id = %s
+    SELECT ex.*, ax.xtrsrc
+    FROM extractedsource ex LEFT JOIN assocxtrsource ax
+                    on ex.id = ax.xtrsrc ,
+    WHERE ex.id = %s
+    AND ex.image = %s
     """, id, image)
                 else:
                     self.db.execute("""\
-    SELECT ex.*, ax.xtrsrc_id
-    FROM extractedsources ex LEFT JOIN assocxtrsources ax 
-                    on ex.xtrsrcid = ax.assoc_xtrsrc_id ,  
-    WHERE ex.xtrsrcid = %s
+    SELECT ex.*, ax.xtrsrc
+    FROM extractedsource ex LEFT JOIN assocxtrsource ax
+                    on ex.id = ax.xtrsrc ,
+    WHERE ex.id = %s
     """, id)
         else: #id is None
             if dataset is not None:
                 if image is not None:
                     self.db.execute("""\
-    SELECT ex.*, im.*, ax.xtrsrc_id
+    SELECT ex.*, im.*, ax.xtrsrc
     FROM 
-        extractedsources ex LEFT JOIN assocxtrsources ax 
-                    on ex.xtrsrcid = ax.assoc_xtrsrc_id , 
-        images im
-    WHERE ex.image_id = im.imageid AND im.ds_id = %s
-    AND ex.image_id = %s
+        extractedsource ex LEFT JOIN assocxtrsource ax
+                    on ex.id = ax.xtrsrc ,
+        image im
+    WHERE ex.image = im.id AND im.dataset = %s
+    AND ex.image = %s
     """, dataset, image)
                 else:
                     self.db.execute("""\
-    SELECT ex.*, im.*, ax.xtrsrc_id
+    SELECT ex.*, im.*, ax.xtrsrc
     FROM 
-        extractedsources ex LEFT JOIN assocxtrsources ax 
-                    on ex.xtrsrcid = ax.assoc_xtrsrc_id , 
-        images im
-    WHERE ex.image_id = im.imageid AND im.ds_id = %s
+        extractedsource ex LEFT JOIN assocxtrsource ax
+                    on ex.id = ax.xtrsrc ,
+        image im
+    WHERE ex.image = im.id AND im.dataset = %s
     """, dataset)
             else:#id is none, dataset is none
                 if image is not None:
                     self.db.execute("""\
-    SELECT ex.*, ax.xtrsrc_id
-    FROM extractedsources ex LEFT JOIN assocxtrsources ax 
-                    on ex.xtrsrcid = ax.assoc_xtrsrc_id   
-    WHERE ex.image_id = %s
+    SELECT ex.*, ax.xtrsrc
+    FROM extractedsource ex LEFT JOIN assocxtrsource ax
+                    on ex.id = ax.xtrsrc
+    WHERE ex.image = %s
     """, image)
                 else: ##All none. Simply return all extracted sources.
                     self.db.execute("""\
-    SELECT ex.*, ax.xtrsrc_id
-    FROM extractedsources ex LEFT JOIN assocxtrsources ax 
-                    on ex.xtrsrcid = ax.assoc_xtrsrc_id   
+    SELECT ex.*, ax.xtrsrc
+    FROM extractedsource ex LEFT JOIN assocxtrsource ax
+                    on ex.id = ax.xtrsrc
     """)
         description = dict(
             [(d[0], i) for i, d in enumerate(self.db.cursor.description)])
@@ -398,7 +398,7 @@ SELECT COUNT(*) FROM extractedsources WHERE image_id = %s"""
                       for key, column in description.iteritems()]))
             # Format into somewhat nicer keys
             for key1, key2 in zip(
-                ['xtrsrcid', 'xtrsrc_id', 'image_id'],
+                ['id', 'xtrsrc', 'image'],
                 ['id', 'assoc_id', 'image']):
                 sources[-1][key2] = sources[-1][key1]
             #sources[-1]['flux'] = {'peak': {}, 'int': {}}
@@ -414,7 +414,7 @@ SELECT COUNT(*) FROM extractedsources WHERE image_id = %s"""
     def monitoringlist(self, dataset):
         # Get all user defined entries
         query = """\
-SELECT * FROM monitoringlist WHERE userentry = true AND ds_id = %s"""
+SELECT * FROM monitoringlist WHERE userentry = true AND dataset = %s"""
         self.db.execute(query, dataset)
         description = dict(
             [(d[0], i) for i, d in enumerate(self.db.cursor.description)])
@@ -425,13 +425,13 @@ SELECT * FROM monitoringlist WHERE userentry = true AND ds_id = %s"""
                       for key, column in description.iteritems()]))
             # Format into somewhat nicer keys;
             for key1, key2 in zip(
-                ['monitorid', 'ds_id'],
+                ['monitorid', 'dataset'],
                 ['id', 'dataset']):
                 sources[-1][key2] = sources[-1][key1]
         # Get all non-user entries belonging to this dataset
         query = """\
 SELECT * FROM monitoringlist ml, runningcatalog rc
-WHERE ml.userentry = false AND ml.xtrsrc_id = rc.xtrsrc_id AND rc.ds_id = %s"""
+WHERE ml.userentry = false AND ml.xtrsrc = rc.xtrsrc AND rc.dataset = %s"""
         self.db.execute(query, dataset)
         description = dict(
             [(d[0], i) for i, d in enumerate(self.db.cursor.description)])
@@ -442,17 +442,17 @@ WHERE ml.userentry = false AND ml.xtrsrc_id = rc.xtrsrc_id AND rc.ds_id = %s"""
             # Format into somewhat nicer keys;
             # replace ra, dec by values from runningcatalog
             for key1, key2 in zip(
-                ['monitorid', 'ds_id', 'wm_ra', 'wm_decl'],
+                ['monitorid', 'dataset', 'wm_ra', 'wm_decl'],
                 ['id', 'dataset', 'ra', 'decl']):
                 sources[-1][key2] = sources[-1][key1]
         return sources
 
-    def update_monitoringlist(self, ra, dec, ds_id):
+    def update_monitoringlist(self, ra, dec, dataset):
         query = """\
 INSERT INTO monitoringlist
-(xtrsrc_id, ra, decl, ds_id, userentry)
+(xtrsrc, ra, decl, dataset, userentry)
 VALUES (-1, %s, %s, %s, TRUE)"""
-        self.db.execute(query, ra, dec, ds_id)
+        self.db.execute(query, ra, dec, dataset)
         self.db.commit()
 
     def delete_monitoringlist(self, sources):
@@ -468,7 +468,7 @@ VALUES (-1, %s, %s, %s, TRUE)"""
 
     def image_times(self, dataset):
         image_times = self.db.get(
-            "SELECT taustart_ts, tau_time FROM images WHERE ds_id = %s",
+            "SELECT taustart_ts, tau_time FROM image WHERE dataset = %s",
             dataset)
         # Make the dates mid-point
         image_times = [(taustart_ts + datetime.timedelta(seconds=tau_time/2),
@@ -483,8 +483,8 @@ VALUES (-1, %s, %s, %s, TRUE)"""
 
         ra, dec, filename = self.db.getone("""\
 SELECT ex.ra, ex.decl, im.url
-FROM extractedsources ex, images im
-WHERE ex.xtrsrcid = %s
-  AND ex.image_id = im.imageid
+FROM extractedsource ex, image im
+WHERE ex.id = %s
+  AND ex.image = im.id
 """, srcid)
         return ra, dec, filename
