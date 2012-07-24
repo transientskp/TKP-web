@@ -431,7 +431,7 @@ SELECT * FROM monitoringlist WHERE userentry = true AND dataset = %s"""
         # Get all non-user entries belonging to this dataset
         query = """\
 SELECT * FROM monitoringlist ml, runningcatalog rc
-WHERE ml.userentry = false AND ml.xtrsrc = rc.xtrsrc AND rc.dataset = %s"""
+WHERE ml.userentry = false AND ml.runcat = rc.id AND rc.dataset = %s"""
         self.db.execute(query, dataset)
         description = dict(
             [(d[0], i) for i, d in enumerate(self.db.cursor.description)])
