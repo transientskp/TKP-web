@@ -73,7 +73,7 @@ WHERE tr.runcat = rc.id AND rc.dataset = %s"""
                     query, datasets[-1]['id'])[0]
             if 'nimages' in extra_info:
                 query = """\
-SELECT COUNT(*) FROM image WHERE id = %s"""
+SELECT COUNT(*) FROM image WHERE dataset = %s"""
                 datasets[-1]['nimages'] = self.db.getone(
                     query, datasets[-1]['id'])[0]
             if 'nsources' in extra_info:
@@ -192,17 +192,16 @@ SELECT COUNT(*) FROM extractedsource WHERE image = %s"""
         if id is not None:  # id = 0 could be valid for some databases
             if dataset is not None:
                 self.db.execute("""\
-    SELECT * FROM transient tr, runningcatalog rc
-    WHERE tr.id = %s AND tr.runcat = rc.id AND rc.dataset = %s""",
-                           id, dataset)
+                    SELECT transient.*, runningcatalog.datapoints FROM runningcatalog, transient WHERE
+                    transient.id=%s AND runningcatalog.dataset=%s AND transient.runcat=runningcatalog.id""", id, dataset)
             else:
                 self.db.execute("""\
-    SELECT * FROM transient WHERE id = %s""", id)
+                    SELECT * FROM transient WHERE id = %s""", id)
         else:
             if dataset is not None:
                 self.db.execute("""\
-    SELECT * FROM transient tr, runningcatalog rc
-    WHERE tr.runcat = rc.id AND dataset = %s""", dataset)
+                    SELECT transient.*,runningcatalog.datapoints FROM transient, runningcatalog
+                    WHERE transient.runcat = runningcatalog.id AND runningcatalog.dataset = %s""", dataset)
             else:
                 self.db.execute("""SELECT * FROM transient""")
         description = dict(
@@ -213,15 +212,15 @@ SELECT COUNT(*) FROM extractedsource WHERE image = %s"""
                 dict([(key, row[column])
                       for key, column in description.iteritems()]))
             # Format into somewhat nicer keys
-            for key1, key2 in zip(
-                ['transientid', 't_start'],
-                ['id', 'startdate']):
-                transients[-1][key2] = transients[-1][key1]
+            #for key1, key2 in zip(
+            #    ['id', 't_start'],
+            #    ['id', 'startdate']):
+            #    transients[-1][key2] = transients[-1][key1]
             # Obtain the actual number of datapoints, including those from
             # sub-detection level monitoring observations
             transients[-1]['npoints'] = self.db.getone(
                 "SELECT COUNT(*) FROM assocxtrsource WHERE xtrsrc = %s",
-                transients[-1]['xtrsrc'])[0]
+                transients[-1]['trigger_xtrsrc'])[0]
             # Calculate the significance level (note: here we do need rc.datapoints,
             # instead of the above npoints)
             n = transients[-1]['datapoints']

@@ -107,6 +107,7 @@ class ImageView(BaseView):
 class TransientsView(BaseView):
     template_name = "dataset/transients.html"
 
+
     def get_context_data(self, **kwargs):
         context = super(TransientsView, self).get_context_data(**kwargs)
         try:
@@ -128,9 +129,9 @@ class TransientView(BaseView):
         else:
             transient = transient[0]
         images = self.database.image_times(dataset=kwargs['dataset'])
-        lightcurve = self.database.lightcurve(int(transient['xtrsrc_id']))
+        lightcurve = self.database.lightcurve(int(transient['trigger_xtrsrc']))
         trigger_index = [i for i, lc in enumerate(lightcurve)
-                         if lc[4] == transient['trigger_xtrsrc_id']][0]
+                         if lc[4] == transient['trigger_xtrsrc']][0]
         context['lightcurve'] = {
             'plot': plot.LightcurvePlot().render(
                 lightcurve, images=images, trigger_index=trigger_index),

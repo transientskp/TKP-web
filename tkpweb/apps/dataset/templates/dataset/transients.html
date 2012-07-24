@@ -30,7 +30,7 @@
 <!-- <td>{{ transient.detection_level }}</td> -->
 <!-- <td>{{ transient.status }}</td> -->
 <td>{{ transient.npoints }}</td>
-<td><a href="{% url 'dataset:source' dataset=dataset.id id=transient.xtrsrc_id %}">{{ transient.xtrsrc_id }}</a></td>
+<td><a href="{% url 'dataset:source' dataset=dataset.id id=transient.runcat %}">{{ transient.runcat }}</a></td>
 </tr>
 {% endfor %}
 </tbody>
