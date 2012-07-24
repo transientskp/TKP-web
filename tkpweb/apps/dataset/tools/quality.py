@@ -10,6 +10,12 @@ from matplotlib.figure import Figure
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 from .plot import Plot
 
+"""NB All functions in this module overlap with those in 
+`qcplots.py` from the tkp repo.
+
+TO DO: Refactor the relevant functions so the code is only in one place. 
+"""
+
 
 def plot_rms_distance_from_fieldcentre(
     database, dsid, dist_arcsec_cutoff=36000, response=None,
