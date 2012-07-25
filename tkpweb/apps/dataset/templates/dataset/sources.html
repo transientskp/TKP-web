@@ -6,7 +6,7 @@
 <table>
 <thead>
 <tr>
-<th>Source #</th>
+<th>Running cat. #</th>
 <th>Right Ascension (&deg;)</th>
 <th>Declination (&deg;)</th>
 <th>Error (RA) (&Prime;)</th>
@@ -18,7 +18,7 @@
 <tbody>
 {% for source in sources %}
 <tr class="{% cycle 'odd' 'even' %}">
-<td><a href="{% url 'dataset:source' dataset=dataset.id id=source.id %}">{{ source.id }}</a></td>
+<td><a href="{% url 'dataset:source' dataset=dataset.id runcat=source.runcat %}">{{ source.runcat }}</a></td>
 <td>{{ source.wm_ra|stringformat:".3f" }}</td>
 <td>{{ source.wm_decl|stringformat:".3f" }}</td>
 <td>{{ source.wm_ra_err|stringformat:".3f" }}</td>

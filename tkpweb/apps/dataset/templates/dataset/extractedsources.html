@@ -25,7 +25,7 @@
 <td><a href="{% url 'dataset:extractedsource' dataset=dataset.id id=extractedsource.id %}">{{ extractedsource.id }}</a></td>
 <td>
 {% if extractedsource.runcat %}
-	<a href="{% url 'dataset:source' dataset=dataset.id id=extractedsource.runcat %}">{{ extractedsource.runcat }}</a>
+	<a href="{% url 'dataset:source' dataset=dataset.id runcat=extractedsource.runcat %}">{{ extractedsource.runcat }}</a>
 {% else %}
 	None
 {% endif %}	</td>

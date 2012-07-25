@@ -15,7 +15,7 @@
 <!-- <th>Detection level</th> -->
 <!-- <th>Status</th> -->
 <th># of datapoints</th>
-<th>Associated source</th>
+<th>Running cat. #</th>
 </tr>
 </thead>
 <tbody>
@@ -30,7 +30,7 @@
 <!-- <td>{{ transient.detection_level }}</td> -->
 <!-- <td>{{ transient.status }}</td> -->
 <td>{{ transient.npoints }}</td>
-<td><a href="{% url 'dataset:source' dataset=dataset.id id=transient.runcat %}">{{ transient.runcat }}</a></td>
+<td><a href="{% url 'dataset:source' dataset=dataset.id runcat=transient.runcat %}">{{ transient.runcat }}</a></td>
 </tr>
 {% endfor %}
 </tbody>

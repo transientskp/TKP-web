@@ -218,8 +218,9 @@ SELECT COUNT(*) FROM extractedsource WHERE image = %s"""
             # Obtain the actual number of datapoints, including those from
             # sub-detection level monitoring observations
             transients[-1]['npoints'] = self.db.getone(
-                "SELECT COUNT(*) FROM assocxtrsource WHERE xtrsrc = %s",
-                transients[-1]['trigger_xtrsrc'])[0]
+                "SELECT COUNT(*) FROM assocxtrsource WHERE runcat = %s",
+                transients[-1]['runcat'])[0]
+            
             # Calculate the significance level (note: here we do need rc.datapoints,
             # instead of the above npoints)
             n = transients[-1]['datapoints']
@@ -228,7 +229,7 @@ SELECT COUNT(*) FROM extractedsource WHERE image = %s"""
         return transients
 
 
-    def source(self, id=None, dataset=None):
+    def source(self, runcat=None, dataset=None):
         """Get information on one or sources from the database
 
         The sources obtained are those in the runningcatalog; these are the
@@ -236,9 +237,9 @@ SELECT COUNT(*) FROM extractedsource WHERE image = %s"""
 
         Kwargs:
 
-            id (int or None): if None, obtain a listing of all applicable
+            runcat (int or None): if None, obtain a listing of all applicable
                 sources. Otherwise, obtain the information for a specific
-                dataset.
+                entry in running catalog
 
             dataset (int or None): limit image(s) to given dataset, if
                 any.
@@ -252,21 +253,23 @@ SELECT COUNT(*) FROM extractedsource WHERE image = %s"""
                 key). For a single image, the returned value is a
                 single-element list.
         """
-
-        if id is not None:  # id = 0 could be valid for some databases
-            if dataset is not None:
-                self.db.execute("""
-    SELECT * FROM runningcatalog
-    WHERE xtrsrc = %s AND dataset = %s""", id, dataset)
-            else:
-                self.db.execute("""\
-    SELECT * FROM runningcatalog WHERE xtrsrc = %s""", id)
-        else:
-            if dataset is not None:
-                self.db.execute("""\
-    SELECT * FROM runningcatalog WHERE dataset = %s""", dataset)
-            else:
-                self.db.execute("""SELECT * FROM runningcatalog""")
+        #NB In new schema Runcat --> Dataset. 
+        #Need only condition on one of these.
+        
+        if runcat is not None:  # id = 0 could be valid for some databases
+            self.db.execute("""
+            SELECT * 
+            FROM runningcatalog
+            WHERE id = %s""", runcat)
+        elif dataset is not None:
+            self.db.execute("""\
+            SELECT * 
+            FROM runningcatalog 
+            WHERE dataset = %s""", dataset)
+        else: #Gotta catch em all
+            self.db.execute("""\
+            SELECT * FROM runningcatalog""")
+            
         description = dict(
             [(d[0], i) for i, d in enumerate(self.db.cursor.description)])
         sources = []
@@ -274,11 +277,8 @@ SELECT COUNT(*) FROM extractedsource WHERE image = %s"""
             sources.append(
                 dict([(key, row[column])
                       for key, column in description.iteritems()]))
-            # Format into somewhat nicer keys
-            for key1, key2 in zip(
-                ['xtrsrc', 'dataset'],
-                ['id', 'dataset']):
-                sources[-1][key2] = sources[-1][key1]
+            # Duplicate dictionary key 'id' as more explicit 'runcat'
+            sources[-1]['runcat'] = sources[-1]['id']
         return sources
 
 
@@ -323,59 +323,31 @@ SELECT COUNT(*) FROM extractedsource WHERE image = %s"""
         WHERE ex.image = im.id
         """
         
+        #NB: image.id implies -> Dataset
+        #    xtrsrc.id implies -> Image.
+        #Therefore, we need only condition 
+        #on the *best* information. (xtrsrc > image > dataset)
 
         if id is not None:  # id = 0 could be valid for some databases
-            if dataset is not None:
-                if image is not None:
-                    q_args = (id, dataset, image)
-                    extra_conditions ="""
-                    AND ex.id = %s  
-                    AND im.dataset = %s 
-                    AND ex.image = %s
-                    """
-                else: #image is None
-                    q_args = (id, dataset)
-                    extra_conditions ="""
-                    AND ex.id = %s  
-                    AND im.dataset = %s 
-                    """
-            else: #id is not none, dataset is none
-                if image is not None:
-                    q_args = (id, image)
-                    extra_conditions ="""
-                    AND ex.id = %s  
-                    AND ex.image = %s 
-                    """
-                else: #image is None
-                    q_args = (id)
-                    extra_conditions ="""
-                    AND ex.id = %s   
-                    """
-        else: #id is None
-            if dataset is not None:
-                if image is not None:
-                    q_args = (dataset, image)
-                    extra_conditions ="""  
-                    AND im.dataset = %s 
-                    AND ex.image = %s
-                    """
-                else: #image, id = None, None
-                    q_args = (dataset)
-                    extra_conditions ="""  
-                    AND im.dataset = %s 
-                    """
-            else:#id is none, dataset is none
-                if image is not None:
-                    q_args = (image)
-                    extra_conditions =""" 
-                    AND ex.image = %s
-                    """
-                else: ##All none. Simply return all extracted sources.
-                    extra_conditions = ''
-                    q_args=()
+            q_args = (id,)
+            extra_condition ="""
+            AND ex.id = %s  
+            """
+        elif image is not None:
+            q_args = (image,)
+            extra_condition ="""  
+            AND ex.image = %s 
+            """
+        elif dataset is not None: #image is None
+            q_args = (dataset,)
+            extra_condition ="""  
+            AND im.dataset = %s 
+            """
+        else: ##All none. Simply return all extracted sources.
+            extra_condition = ''
+            q_args=()
                     
-        q_args = tuple(int(j) for j in q_args)
-        self.db.cursor.execute(partial_query+extra_conditions, q_args)
+        self.db.cursor.execute(partial_query+extra_condition, q_args)
         description = dict(
             [(d[0], i) for i, d in enumerate(self.db.cursor.description)])
         sources = []
@@ -387,29 +359,10 @@ SELECT COUNT(*) FROM extractedsource WHERE image = %s"""
 
 
     def monitoringlist(self, dataset):
-        # Get all user defined entries
-        query = """\
-SELECT * FROM monitoringlist WHERE userentry = true AND dataset = %s"""
-        self.db.execute(query, dataset)
-        description = dict(
-            [(d[0], i) for i, d in enumerate(self.db.cursor.description)])
-        sources = []
-        for row in self.db.cursor.fetchall():
-            sources.append(
-                dict([(key, row[column])
-                      for key, column in description.iteritems()]))
-        # Get all non-user entries belonging to this dataset
-        query = """\
-SELECT * FROM monitoringlist ml, runningcatalog rc
-WHERE ml.userentry = false AND ml.runcat = rc.id AND rc.dataset = %s"""
-        self.db.execute(query, dataset)
-        description = dict(
-            [(d[0], i) for i, d in enumerate(self.db.cursor.description)])
-        for row in self.db.cursor.fetchall():
-            sources.append(
-                dict([(key, row[column])
-                      for key, column in description.iteritems()]))
-        return sources
+        return tkpdb.utils.columns_from_table(self.db.connection,
+                                              'monitoringlist', 
+                                              where={"dataset":dataset})
+        
 
     def update_monitoringlist(self, ra, dec, dataset):
         query = """\

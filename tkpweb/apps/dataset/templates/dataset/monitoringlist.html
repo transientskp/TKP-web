@@ -9,7 +9,8 @@
 <table>
 <thead>
 <tr>
-<th>Source #</th>
+<th>Monitoringlist #</th>
+<th>Running cat. #</th>
 <th>Right Ascension</th>
 <th>Declination</th>
 <th>User entry</th>
@@ -19,10 +20,16 @@
 <tbody>
 {% for source in sources %}
 <tr class="{% cycle 'odd' 'even' %}">
-<td>{% if source.xtrsrc_id > 0 %}<a href="{% url 'dataset:source' dataset=dataset.id id=source.xtrsrc_id%}">{{ source.xtrsrc_id }}</a>{% else %}-{% endif %}</td>
+<td>{{ source.id }}</td>
+<td>{% if source.runcat %}
+	<a href="{% url 'dataset:source' dataset=dataset.id runcat=source.runcat%}">{{ source.runcat }}</a>
+	{% else %}-{% endif %}
+</td>
 <td>{{ source.ra|stringformat:".3f" }}</td>
 <td> {{ source.decl|stringformat:".3f" }}</td>
-<td>{% if source.userentry %}&#x2713;{% else %}-{% endif %}</td>
+<!-- #Could use a cross for False, but probably a dash is less visually distracting -->
+<!-- <td>{% if source.userentry %}&#x2713;{% else %}&#x2717;{% endif %}</td> -->   
+<td>{% if source.userentry %}&#x2713;{% else %}-{% endif %}</td>  
 {% if request.user.is_authenticated and perms.monitoringlist.change_monitoringlist %}<td><input type="checkbox" value="{{ source.monitorid }}" name="sources" /></td>{% endif %}
 </tr>
 {% endfor %}

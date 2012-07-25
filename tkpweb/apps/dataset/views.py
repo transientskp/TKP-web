@@ -162,7 +162,7 @@ class SourceView(BaseView):
 
     def get_context_data(self, **kwargs):
         context = super(SourceView, self).get_context_data(**kwargs)
-        source = self.database.source(id=kwargs['id'], dataset=kwargs['dataset'])
+        source = self.database.source(runcat=kwargs['runcat'], dataset=kwargs['dataset'])
         if not source:
             raise Http404
         else:

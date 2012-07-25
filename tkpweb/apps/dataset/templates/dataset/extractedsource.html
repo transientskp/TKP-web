@@ -35,7 +35,7 @@
     <th>Running cat. id</th>
     <td>
       {% if extractedsource.runcat %}
-        <a href="{% url 'dataset:source' dataset=dataset.id id=extractedsource.runcat %}">{{ extractedsource.runcat }}</a>
+        <a href="{% url 'dataset:source' dataset=dataset.id runcat=extractedsource.runcat %}">{{ extractedsource.runcat }}</a>
       {% else %}
         None
       {% endif %}
