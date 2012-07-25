@@ -1,5 +1,4 @@
-from tkp.database import database
-from tkp.database.dataset import ExtractedSource
+import tkp.database as tkpdb
 from scipy.stats import chisqprob
 from .image import open_image
 from tkpweb import settings
@@ -10,7 +9,7 @@ class DataBase(object):
 
     def __init__(self, dblogin=None):
         self.dblogin = dblogin
-        self.db = database.DataBase(**dblogin) if dblogin else database.DataBase()
+        self.db = tkpdb.DataBase(**dblogin) if dblogin else tkpdb.DataBase()
 
     def dataset(self, id=None, extra_info=()):
         """Get information on one or more datasets form the database
@@ -315,79 +314,68 @@ SELECT COUNT(*) FROM extractedsource WHERE image = %s"""
             'image': if of image from which source extracted
         """
 
+        partial_query = """\
+        SELECT ex.*, im.dataset as dataset, ax.runcat as runcat
+        FROM 
+            extractedsource ex LEFT JOIN assocxtrsource ax
+                        on ex.id = ax.xtrsrc,
+            image im
+        WHERE ex.image = im.id
+        """
+        
+
         if id is not None:  # id = 0 could be valid for some databases
             if dataset is not None:
                 if image is not None:
-                    self.db.execute("""
-    SELECT ex.*, im.*, ax.xtrsrc
-    FROM 
-        extractedsource ex LEFT JOIN assocxtrsource ax
-                    on ex.id = ax.xtrsrc,
-        image im
-    WHERE ex.id = %s AND ex.image = im.id AND
-    im.dataset = %s and ex.image = %s
-    """, id, dataset, image)
-                else:
-                    self.db.execute("""
-    SELECT ex.*, im.*, ax.xtrsrc
-    FROM 
-        extractedsource ex LEFT JOIN assocxtrsource ax
-                    on ex.id = ax.xtrsrc,
-        image im, assocxtrsource ax
-    WHERE ex.id = %s AND ex.image = im.id AND
-    im.dataset = %s
-    """, id, dataset)
+                    q_args = (id, dataset, image)
+                    extra_conditions ="""
+                    AND ex.id = %s  
+                    AND im.dataset = %s 
+                    AND ex.image = %s
+                    """
+                else: #image is None
+                    q_args = (id, dataset)
+                    extra_conditions ="""
+                    AND ex.id = %s  
+                    AND im.dataset = %s 
+                    """
             else: #id is not none, dataset is none
                 if image is not None:
-                    self.db.execute("""\
-    SELECT ex.*, ax.xtrsrc
-    FROM extractedsource ex LEFT JOIN assocxtrsource ax
-                    on ex.id = ax.xtrsrc ,
-    WHERE ex.id = %s
-    AND ex.image = %s
-    """, id, image)
-                else:
-                    self.db.execute("""\
-    SELECT ex.*, ax.xtrsrc
-    FROM extractedsource ex LEFT JOIN assocxtrsource ax
-                    on ex.id = ax.xtrsrc ,
-    WHERE ex.id = %s
-    """, id)
+                    q_args = (id, image)
+                    extra_conditions ="""
+                    AND ex.id = %s  
+                    AND ex.image = %s 
+                    """
+                else: #image is None
+                    q_args = (id)
+                    extra_conditions ="""
+                    AND ex.id = %s   
+                    """
         else: #id is None
             if dataset is not None:
                 if image is not None:
-                    self.db.execute("""\
-    SELECT ex.*, im.*, ax.xtrsrc
-    FROM 
-        extractedsource ex LEFT JOIN assocxtrsource ax
-                    on ex.id = ax.xtrsrc ,
-        image im
-    WHERE ex.image = im.id AND im.dataset = %s
-    AND ex.image = %s
-    """, dataset, image)
-                else:
-                    self.db.execute("""\
-    SELECT ex.*, im.*, ax.xtrsrc
-    FROM 
-        extractedsource ex LEFT JOIN assocxtrsource ax
-                    on ex.id = ax.xtrsrc ,
-        image im
-    WHERE ex.image = im.id AND im.dataset = %s
-    """, dataset)
+                    q_args = (dataset, image)
+                    extra_conditions ="""  
+                    AND im.dataset = %s 
+                    AND ex.image = %s
+                    """
+                else: #image, id = None, None
+                    q_args = (dataset)
+                    extra_conditions ="""  
+                    AND im.dataset = %s 
+                    """
             else:#id is none, dataset is none
                 if image is not None:
-                    self.db.execute("""\
-    SELECT ex.*, ax.xtrsrc
-    FROM extractedsource ex LEFT JOIN assocxtrsource ax
-                    on ex.id = ax.xtrsrc
-    WHERE ex.image = %s
-    """, image)
+                    q_args = (image)
+                    extra_conditions =""" 
+                    AND ex.image = %s
+                    """
                 else: ##All none. Simply return all extracted sources.
-                    self.db.execute("""\
-    SELECT ex.*, ax.xtrsrc
-    FROM extractedsource ex LEFT JOIN assocxtrsource ax
-                    on ex.id = ax.xtrsrc
-    """)
+                    extra_conditions = ''
+                    q_args=()
+                    
+        q_args = tuple(int(j) for j in q_args)
+        self.db.cursor.execute(partial_query+extra_conditions, q_args)
         description = dict(
             [(d[0], i) for i, d in enumerate(self.db.cursor.description)])
         sources = []
@@ -395,18 +383,6 @@ SELECT COUNT(*) FROM extractedsource WHERE image = %s"""
             sources.append(
                 dict([(key, row[column])
                       for key, column in description.iteritems()]))
-            # Format into somewhat nicer keys
-            for key1, key2 in zip(
-                ['id', 'xtrsrc', 'image'],
-                ['id', 'assoc_id', 'image']):
-                sources[-1][key2] = sources[-1][key1]
-            #sources[-1]['flux'] = {'peak': {}, 'int': {}}
-            #    for fluxtype in ('peak', 'int'):
-            #        sources[-1]['flux'][fluxtype].append(
-            #            {'stokes': stokes,
-            #             'value': sources[-1][stokes+"_"+fluxtype],
-            #             'error': sources[-1][stokes+"_"+fluxtype+"_err"]}
-            #            )
         return sources
 
 
@@ -422,11 +398,6 @@ SELECT * FROM monitoringlist WHERE userentry = true AND dataset = %s"""
             sources.append(
                 dict([(key, row[column])
                       for key, column in description.iteritems()]))
-            # Format into somewhat nicer keys;
-            for key1, key2 in zip(
-                ['monitorid', 'dataset'],
-                ['id', 'dataset']):
-                sources[-1][key2] = sources[-1][key1]
         # Get all non-user entries belonging to this dataset
         query = """\
 SELECT * FROM monitoringlist ml, runningcatalog rc
@@ -438,12 +409,6 @@ WHERE ml.userentry = false AND ml.runcat = rc.id AND rc.dataset = %s"""
             sources.append(
                 dict([(key, row[column])
                       for key, column in description.iteritems()]))
-            # Format into somewhat nicer keys;
-            # replace ra, dec by values from runningcatalog
-            for key1, key2 in zip(
-                ['monitorid', 'dataset', 'wm_ra', 'wm_decl'],
-                ['id', 'dataset', 'ra', 'decl']):
-                sources[-1][key2] = sources[-1][key1]
         return sources
 
     def update_monitoringlist(self, ra, dec, dataset):
@@ -461,7 +426,7 @@ VALUES (-1, %s, %s, %s, TRUE)"""
             self.db.commit()
 
     def lightcurve(self, srcid):
-        lc = ExtractedSource(id=srcid, database=self.db).lightcurve()
+        lc = tkpdb.ExtractedSource(id=srcid, database=self.db).lightcurve()
         return lc
 
 

@@ -6,8 +6,8 @@
 <table>
 <thead>
 <tr>
-<th>Extracted source #</th>
-<th>Associated source #</th>
+<th>Extracted src. #</th>
+<th>Running cat. #</th>
 <th>Right Ascension</th>
 <th>Declination</th>
 <th>Error (RA)</th>
@@ -24,8 +24,8 @@
 <tr class="{% cycle 'odd' 'even' %}">
 <td><a href="{% url 'dataset:extractedsource' dataset=dataset.id id=extractedsource.id %}">{{ extractedsource.id }}</a></td>
 <td>
-{% if extractedsource.assoc_id %}
-	<a href="{% url 'dataset:source' dataset=dataset.id id=extractedsource.assoc_id %}">{{ extractedsource.assoc_id }}</a>
+{% if extractedsource.runcat %}
+	<a href="{% url 'dataset:source' dataset=dataset.id id=extractedsource.runcat %}">{{ extractedsource.runcat }}</a>
 {% else %}
 	None
 {% endif %}	</td>

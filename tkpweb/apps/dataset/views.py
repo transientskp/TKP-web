@@ -11,8 +11,8 @@ from .tools import dbase
 from .tools import plot
 from .tools import quality
 from .forms import MonitoringListForm
-from tkp.database.database import DataBase
-import tkp.database.dataset as dbset
+from tkp.database import DataBase
+
 import tkp.database.utils as tkpdbutils
 from tkp.classification.transient import Transient
 from tkp.classification.transient import Position

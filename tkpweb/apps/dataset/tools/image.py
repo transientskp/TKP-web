@@ -1,5 +1,5 @@
 import os
-from tkp.database.database import DataBase
+from tkp.database import DataBase
 from tkp.utility.accessors import DataAccessor
 from tkp.utility.accessors import FITSImage
 from tkp.utility.accessors import CASAImage

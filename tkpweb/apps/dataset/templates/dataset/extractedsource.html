@@ -32,10 +32,10 @@
     <td><a href="{% url 'dataset:image' dataset=dataset.id id=extractedsource.image %}">{{ extractedsource.image }}</a></td>
   </tr>
   <tr>
-    <th>Associated Source</th>
+    <th>Running cat. id</th>
     <td>
-      {% if extractedsource.assoc_id %}
-        <a href="{% url 'dataset:source' dataset=dataset.id id=extractedsource.assoc_id %}">{{ extractedsource.assoc_id }}</a>
+      {% if extractedsource.runcat %}
+        <a href="{% url 'dataset:source' dataset=dataset.id id=extractedsource.runcat %}">{{ extractedsource.runcat }}</a>
       {% else %}
         None
       {% endif %}
