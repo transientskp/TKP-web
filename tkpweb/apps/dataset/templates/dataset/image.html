@@ -28,8 +28,18 @@
     <td>{{ image.bandwithh|prefixformat:"M"|stringformat:".3f" }} MHz.</td>
   </tr>
   <tr>
+    <th>FWHM</th>
+    <td>{% if image.fwhm_arcsec %}{{ image.fwhm_arcsec|stringformat:".3f" }} as
+    	{% else %}-{% endif %}
+	</td>
+  </tr>
+  <tr>
     <th>Dataset</th>
     <td><a href="{% url 'dataset:dataset' id=image.dataset %}">{{ image.dataset }}</a></td>
+  </tr>
+  <tr>
+    <th>URL</th>
+    <td>{{image.url}}</td>
   </tr>
 </table>
 
