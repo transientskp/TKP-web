@@ -191,18 +191,23 @@ SELECT COUNT(*) FROM extractedsource WHERE image = %s"""
         if id is not None:  # id = 0 could be valid for some databases
             if dataset is not None:
                 self.db.execute("""\
-                    SELECT transient.*, runningcatalog.datapoints FROM runningcatalog, transient WHERE
-                    transient.id=%s AND runningcatalog.dataset=%s AND transient.runcat=runningcatalog.id""", id, dataset)
+                    SELECT transient.*, rc.datapoints, rc.wm_ra, rc.wm_decl FROM runningcatalog as rc, transient WHERE
+                    transient.id=%s AND rc.dataset=%s AND transient.runcat=rc.id""", id, dataset)
             else:
                 self.db.execute("""\
-                    SELECT * FROM transient WHERE id = %s""", id)
+                    SELECT transient.*, rc.datapoints, rc.wm_ra, rc.wm_decl FROM runningcatalog as rc, transient WHERE
+                    transient.id=%s AND transient.runcat=rc.id""", id)
         else:
             if dataset is not None:
                 self.db.execute("""\
-                    SELECT transient.*,runningcatalog.datapoints FROM transient, runningcatalog
-                    WHERE transient.runcat = runningcatalog.id AND runningcatalog.dataset = %s""", dataset)
+                    SELECT transient.*, rc.datapoints, rc.wm_ra, rc.wm_decl FROM runningcatalog as rc, transient WHERE
+                    rc.dataset=%s AND transient.runcat=rc.id""", dataset)
             else:
-                self.db.execute("""SELECT * FROM transient""")
+                self.db.execute("""\
+                    SELECT transient.*, rc.datapoints, rc.wm_ra, rc.wm_decl FROM runningcatalog as rc, transient WHERE
+                    transient.runcat=rc.id""")
+
+
         description = dict(
             [(d[0], i) for i, d in enumerate(self.db.cursor.description)])
         transients = []

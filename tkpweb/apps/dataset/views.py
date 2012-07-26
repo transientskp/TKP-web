@@ -110,11 +110,12 @@ class TransientsView(BaseView):
 
     def get_context_data(self, **kwargs):
         context = super(TransientsView, self).get_context_data(**kwargs)
+        dataset = kwargs['dataset']
         try:
-            context['dataset'] = self.database.dataset(id=kwargs['dataset'])[0]
+            context['dataset'] = self.database.dataset(id=dataset)[0]
         except IndexError:
             raise Http404
-        context['transients'] = self.database.transient(dataset=kwargs['dataset'])
+        context['transients'] = self.database.transient(dataset=dataset)
         return context
 
 
@@ -123,12 +124,14 @@ class TransientView(BaseView):
 
     def get_context_data(self, **kwargs):
         context = super(TransientView, self).get_context_data(**kwargs)
-        transient = self.database.transient(id=kwargs['id'], dataset=kwargs['dataset'])
+        id = kwargs['id']
+        dataset = kwargs['dataset']
+        transient = self.database.transient(id=id, dataset=dataset)
         if not transient:
             raise Http404
         else:
             transient = transient[0]
-        images = self.database.image_times(dataset=kwargs['dataset'])
+        images = self.database.image_times(dataset=dataset)
         lightcurve = self.database.lightcurve(int(transient['trigger_xtrsrc']))
         trigger_index = [i for i, lc in enumerate(lightcurve)
                          if lc[4] == transient['trigger_xtrsrc']][0]
@@ -137,7 +140,7 @@ class TransientView(BaseView):
                 lightcurve, images=images, trigger_index=trigger_index),
             'data': lightcurve
             }
-        context['dataset'] = self.database.dataset(id=kwargs['dataset'])[0]
+        context['dataset'] = self.database.dataset(id=dataset)[0]
         context['transient'] = transient
         context['lightcurve']['thumbnails'] = []
         for point in context['lightcurve']['data']:
