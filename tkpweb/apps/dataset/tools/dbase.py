@@ -364,11 +364,25 @@ SELECT COUNT(*) FROM extractedsource WHERE image = %s"""
 
 
     def monitoringlist(self, dataset):
-        return tkpdb.utils.columns_from_table(self.db.connection,
+        monlist_entries =  tkpdb.utils.columns_from_table(self.db.connection,
                                               'monitoringlist', 
                                               where={"dataset":dataset})
         
-
+        #Replace empty ra, dec with runcat weighted means for blind entries
+        for m in monlist_entries:
+            if m['userentry']==False:
+                runcat_entry = tkpdb.utils.columns_from_table(
+                                              self.db.connection,
+                                              'runningcatalog',
+                                              keywords=['wm_ra','wm_decl'],
+                                              where={'id':m['runcat']}
+                                              )[0]
+                print runcat_entry
+                m['ra']=runcat_entry['wm_ra']
+                m['decl']=runcat_entry['wm_decl'] 
+        return monlist_entries
+    
+    
     def update_monitoringlist(self, ra, dec, dataset):
         query = """\
 INSERT INTO monitoringlist
