@@ -377,7 +377,7 @@ SELECT COUNT(*) FROM extractedsource WHERE image = %s"""
                                               keywords=['wm_ra','wm_decl'],
                                               where={'id':m['runcat']}
                                               )[0]
-                print runcat_entry
+#                print runcat_entry
                 m['ra']=runcat_entry['wm_ra']
                 m['decl']=runcat_entry['wm_decl'] 
         return monlist_entries
