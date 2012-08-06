@@ -191,20 +191,20 @@ SELECT COUNT(*) FROM extractedsource WHERE image = %s"""
         if id is not None:  # id = 0 could be valid for some databases
             if dataset is not None:
                 self.db.execute("""\
-                    SELECT transient.*, rc.datapoints, rc.wm_ra, rc.wm_decl FROM runningcatalog as rc, transient WHERE
+                    SELECT transient.*, rc.datapoints, rc.wm_ra, rc.wm_ra_err, rc.wm_decl, rc.wm_decl_err FROM runningcatalog as rc, transient WHERE
                     transient.id=%s AND rc.dataset=%s AND transient.runcat=rc.id""", id, dataset)
             else:
                 self.db.execute("""\
-                    SELECT transient.*, rc.datapoints, rc.wm_ra, rc.wm_decl FROM runningcatalog as rc, transient WHERE
+                    SELECT transient.*, rc.datapoints, rc.wm_ra, rc.wm_ra_err, rc.wm_decl, rc.wm_decl_err FROM runningcatalog as rc, transient WHERE
                     transient.id=%s AND transient.runcat=rc.id""", id)
         else:
             if dataset is not None:
                 self.db.execute("""\
-                    SELECT transient.*, rc.datapoints, rc.wm_ra, rc.wm_decl FROM runningcatalog as rc, transient WHERE
+                    SELECT transient.*, rc.datapoints, rc.wm_ra, rc.wm_ra_err, rc.wm_decl, rc.wm_decl_err FROM runningcatalog as rc, transient WHERE
                     rc.dataset=%s AND transient.runcat=rc.id""", dataset)
             else:
                 self.db.execute("""\
-                    SELECT transient.*, rc.datapoints, rc.wm_ra, rc.wm_decl FROM runningcatalog as rc, transient WHERE
+                    SELECT transient.*, rc.datapoints, rc.wm_ra, rc.wm_ra_err, rc.wm_decl, rc.wm_decl_err FROM runningcatalog as rc, transient WHERE
                     transient.runcat=rc.id""")
 
 
