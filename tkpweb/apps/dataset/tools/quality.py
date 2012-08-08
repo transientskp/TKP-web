@@ -6,14 +6,15 @@ Based on tkp/database/qcplots.py
 import StringIO
 import base64
 import numpy
+from textwrap import dedent
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 from .plot import Plot
 
-"""NB All functions in this module overlap with those in 
+"""NB All functions in this module overlap with those in
 `qcplots.py` from the tkp repo.
 
-TO DO: Refactor the relevant functions so the code is only in one place. 
+TO DO: Refactor the relevant functions so the code is only in one place.
 """
 
 
@@ -24,32 +25,36 @@ def plot_rms_distance_from_fieldcentre(
     distance from the field centre."""
 
     query = """\
-SELECT *
-FROM (SELECT ex.image
-            ,ex.id as xtrsrcid1
-            ,3600* DEGREES(2 * ASIN(SQRT( (ex.x - rc.x) * (ex.x - rc.x)
-                                        + (ex.y - rc.y) * (ex.y - rc.y)
-                                        + (ex.z - rc.z) * (ex.z - rc.z)
-                                        ) / 2)) AS centr_img_dist_deg
-            ,20000 * ex.f_peak / ex.det_sigma as rms_mJy
-        FROM extractedsource ex
-            ,image im
-            ,runningcatalog rc
-       WHERE ex.image = im.id
-         AND im.dataset = rc.dataset
-         AND rc.dataset = %s
-         AND rc.xtrsrc = ex.id
-      ) t
-WHERE centr_img_dist_deg < %s
-ORDER BY centr_img_dist_deg
-"""
+    SELECT *
+    FROM (SELECT ex.image
+                ,ex.id as xtrsrcid1
+                ,3600* DEGREES(2 * ASIN(SQRT( (ex.x - rc.x) * (ex.x - rc.x)
+                                            + (ex.y - rc.y) * (ex.y - rc.y)
+                                            + (ex.z - rc.z) * (ex.z - rc.z)
+                                            ) / 2)) AS centr_img_dist_deg
+                ,CASE WHEN ex.det_sigma < 1e-6
+                    THEN 0.0
+                    ELSE 20000 * ex.f_peak / ex.det_sigma
+                 END as rms_mJy
+            FROM extractedsource ex
+                ,image im
+                ,runningcatalog rc
+           WHERE ex.image = im.id
+             AND im.dataset = rc.dataset
+             AND rc.dataset = %s
+             AND rc.xtrsrc = ex.id
+          ) t
+    WHERE centr_img_dist_deg < %s
+    ORDER BY centr_img_dist_deg
+    """
+    query = dedent(query)
     database.db.cursor.execute(query, (dsid, dist_arcsec_cutoff))
     results = zip(*database.db.get(query, dsid, dist_arcsec_cutoff))
 
     if not results:
         return None
     dist_deg, rms = results[2], results[3]
-    
+
     figure = Figure(figsize=size)
     canvas = FigureCanvasAgg(figure)
     axes = figure.add_subplot(1, 1, 1)
