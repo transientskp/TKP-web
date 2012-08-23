@@ -88,7 +88,7 @@ class ImagePlot(Plot):
             semimajor = [source['semimajor']/900 for source in plotsources]
             semiminor = [source['semiminor']/900 for source in plotsources]
             pa = [source['pa']+90 for source in plotsources]
-            image.show_ellipses(ra, dec, semimajor, semiminor, pa, facecolor='none', edgecolor='green')
+            image.show_ellipses(ra, dec, semimajor, semiminor, pa, facecolor='yellow', edgecolor='red')
 
 
 class ThumbnailPlot(Plot):
