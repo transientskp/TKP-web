@@ -266,7 +266,7 @@ class TransientLightcurveView(BaseView):
         else:
             transient = transient[0]
         context['transient'] = transient
-        context['id'] = transient['xtrsrc_id']
+        context['id'] = transient['trigger_xtrsrc']
         return context
 
     def render_to_response(self, context, **kwargs):
@@ -309,3 +309,6 @@ class ImagePlotView(BaseView):
         plot.ImagePlot(response=response, size=(12, 12)).render(
             image, plotsources=sources)
         return response
+
+class TransientLightsurfaceView(BaseView):
+    pass
