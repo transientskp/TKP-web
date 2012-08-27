@@ -311,4 +311,20 @@ class ImagePlotView(BaseView):
         return response
 
 class TransientLightsurfaceView(BaseView):
-    pass
+
+    def get_context_data(self, **kwargs):
+        context = super(TransientLightsurfaceView, self).get_context_data(**kwargs)
+        transient = self.database.transient(id=kwargs['id'], dataset=kwargs['dataset'])
+        if not transient:
+            raise Http404
+        else:
+            transient = transient[0]
+        context['transient'] = transient
+        context['id'] = transient['trigger_xtrsrc']
+        return context
+
+    def render_to_response(self, context, **kwargs):
+        response = HttpResponse(mimetype="image/png")
+        plot.LightcurvePlot(response=response).render(
+            self.database.lightcurve(context['id']))
+        return response

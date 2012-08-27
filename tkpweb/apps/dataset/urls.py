@@ -13,6 +13,7 @@ from .views import TransientLightcurveView
 from .views import TransientsView
 from .views import TransientView
 from .views import MonitoringListView
+from .views import TransientLightsurfaceView
 
 
 urlpatterns = patterns(
@@ -22,6 +23,7 @@ urlpatterns = patterns(
    url(r'^(?P<dataset>\d+)/image/(?P<id>\d+)/$', view=ImageView.as_view(), name='image'),
    url(r'^(?P<dataset>\d+)/image/$', view=ImagesView.as_view(), name='images'),
    url(r'^(?P<dataset>\d+)/transient/(?P<id>\d+)/lightcurve/$', view=TransientLightcurveView.as_view(), name='transient-lightcurve'),
+   url(r'^(?P<dataset>\d+)/transient/(?P<id>\d+)/lightsurface/$', view=TransientLightsurfaceView.as_view(), name='transient-lightsurface'),
    url(r'^(?P<dataset>\d+)/transient/(?P<id>\d+)/$', view=TransientView.as_view(), name='transient'),
    url(r'^(?P<dataset>\d+)/transient/$', view=TransientsView.as_view(), name='transients'),
    url(r'^(?P<dataset>\d+)/source/(?P<runcat>\d+)/lightcurve/$', view=SourceLightcurveView.as_view(), name='source-lightcurve'),
