@@ -10,6 +10,8 @@
 <th>Position</th>
 <th>Start date</th>
 <th>Significance level</th>
+<th>band</th>
+<th>freq_eff</th>
 <th>&eta;<sub>&nu;</sub></th>
 <th>V<sub>&nu;</sub></th>
 <!-- <th>Detection level</th> -->
@@ -25,8 +27,10 @@
 <td>{{ transient.wm_ra|stringformat:".3f" }}, {{ transient.wm_decl|stringformat:".3f" }}</td>
 <td>{% if transient.startdate %}{{ transient.startdate|date:"c" }}{% else %}-{% endif %}</td>
 <td>{{ transient.siglevel|stringformat:".3f" }}</td>
-<td>{{ transient.eta|stringformat:".2f" }}</td>
-<td>{{ transient.v|stringformat:".4f" }}</td>
+<td>{{ transient.band }}</td>
+<td>{{ transient.freq_eff|prefixformat:"M"|stringformat:".3f" }}</td>
+<td>{{ transient.eta_int|stringformat:".2f" }}</td>
+<td>{{ transient.v_int|stringformat:".4f" }}</td>
 <!-- <td>{{ transient.detection_level }}</td> -->
 <!-- <td>{{ transient.status }}</td> -->
 <td>{{ transient.npoints }}</td>

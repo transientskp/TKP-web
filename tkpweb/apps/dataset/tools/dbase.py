@@ -191,25 +191,86 @@ SELECT COUNT(*) FROM extractedsource WHERE image = %s"""
         if id is not None:  # id = 0 could be valid for some databases
             if dataset is not None:
                 self.db.execute("""\
-                    SELECT transient.*, rc.datapoints, rc.wm_ra, rc.wm_ra_err, rc.wm_decl, rc.wm_decl_err FROM runningcatalog as rc, transient WHERE
-                    transient.id=%s AND rc.dataset=%s AND transient.runcat=rc.id""", id, dataset)
+                    SELECT t.id
+                          ,t.runcat
+                          ,t.trigger_xtrsrc
+                          ,i.freq_eff
+                          ,t.band
+                          ,t.siglevel
+                          ,t.V_int
+                          ,t.eta_int
+                          ,t.t_start
+                          ,rc.datapoints
+                          ,rc.wm_ra
+                          ,rc.wm_ra_err
+                          ,rc.wm_decl
+                          ,rc.wm_decl_err 
+                      FROM runningcatalog as rc
+                          ,transient t
+                          ,extractedsource x
+                          ,image i
+                     WHERE t.id = %s 
+                       AND rc.dataset = %s 
+                       AND t.runcat = rc.id
+                       AND t.trigger_xtrsrc = x.id
+                       AND x.image = i.id
+                    """, id, dataset)
             else:
                 self.db.execute("""\
-                    SELECT transient.*, rc.datapoints, rc.wm_ra, rc.wm_ra_err, rc.wm_decl, rc.wm_decl_err FROM runningcatalog as rc, transient WHERE
-                    transient.id=%s AND transient.runcat=rc.id""", id)
+                    SELECT transient.*
+                          ,rc.datapoints
+                          ,rc.wm_ra
+                          ,rc.wm_ra_err
+                          ,rc.wm_decl
+                          ,rc.wm_decl_err 
+                      FROM runningcatalog as rc
+                          ,transient 
+                     WHERE transient.id = %s 
+                       AND transient.runcat = rc.id
+                    """, id)
         else:
             if dataset is not None:
                 self.db.execute("""\
-                    SELECT transient.*, rc.datapoints, rc.wm_ra, rc.wm_ra_err, rc.wm_decl, rc.wm_decl_err FROM runningcatalog as rc, transient WHERE
-                    rc.dataset=%s AND transient.runcat=rc.id""", dataset)
+                    SELECT t.id
+                          ,t.runcat
+                          ,t.trigger_xtrsrc
+                          ,i.freq_eff
+                          ,t.band
+                          ,t.siglevel
+                          ,t.V_int
+                          ,t.eta_int
+                          ,t.t_start
+                          ,rc.datapoints
+                          ,rc.wm_ra
+                          ,rc.wm_ra_err
+                          ,rc.wm_decl
+                          ,rc.wm_decl_err 
+                      FROM runningcatalog as rc
+                          ,transient t
+                          ,extractedsource x
+                          ,image i
+                     WHERE rc.dataset = %s 
+                       AND t.runcat = rc.id
+                       AND t.trigger_xtrsrc = x.id
+                       AND x.image = i.id
+                    """, dataset)
             else:
                 self.db.execute("""\
-                    SELECT transient.*, rc.datapoints, rc.wm_ra, rc.wm_ra_err, rc.wm_decl, rc.wm_decl_err FROM runningcatalog as rc, transient WHERE
-                    transient.runcat=rc.id""")
+                    SELECT transient.*
+                          ,rc.datapoints
+                          ,rc.wm_ra
+                          ,rc.wm_ra_err
+                          ,rc.wm_decl
+                          ,rc.wm_decl_err 
+                      FROM runningcatalog as rc
+                          ,transient 
+                     WHERE transient.runcat = rc.id
+                    """)
 
 
         description = dict(
             [(d[0], i) for i, d in enumerate(self.db.cursor.description)])
+        print "description:",description
         transients = []
         for row in self.db.cursor.fetchall():
             transients.append(
@@ -226,11 +287,13 @@ SELECT COUNT(*) FROM extractedsource WHERE image = %s"""
                 "SELECT COUNT(*) FROM assocxtrsource WHERE runcat = %s",
                 transients[-1]['runcat'])[0]
             
+            # TODO: FEEDBACK: Why is the siglevel recalculated. This was
+            # already done and stored in the transient table
             # Calculate the significance level (note: here we do need rc.datapoints,
             # instead of the above npoints)
-            n = transients[-1]['datapoints']
-            transients[-1]['siglevel'] = chisqprob(
-                transients[-1]['siglevel'] * n, n)
+            #n = transients[-1]['datapoints']
+            #transients[-1]['siglevel'] = chisqprob(
+            #    transients[-1]['siglevel'] * n, n)
         return transients
 
 

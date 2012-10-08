@@ -14,16 +14,24 @@
     <td>({{ transient.wm_ra|stringformat:".3f" }}&deg;, {{ transient.wm_decl|stringformat:".3f" }}&deg;) &pm; ({{ transient.wm_ra_err|stringformat:".3f" }}&Prime;, {{ transient.wm_decl_err|stringformat:".3f" }}&Prime;)</td>
   </tr>
   <tr>
+    <th>Frequency band</th>
+    <td>{{ transient.band }}</td>
+  </tr>
+  <tr>
+    <th>Effective frequency</th>
+    <td>{{ transient.freq_eff }}</td>
+  </tr>
+  <tr>
     <th>Significance level</th>
     <td>{{ transient.siglevel }}</td>
   </tr>
   <tr>
     <th>&eta;<sub>&nu;</sub></th>
-    <td>{{ transient.eta }}</td>
+    <td>{{ transient.eta_int }}</td>
   </tr>
   <tr>
     <th>V<sub>&nu;</sub></th>
-    <td>{{ transient.v }}</td>
+    <td>{{ transient.v_int }}</td>
   </tr>
   <tr>
     <th>Start date</th>
