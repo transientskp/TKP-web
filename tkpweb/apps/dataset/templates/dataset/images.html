@@ -16,6 +16,7 @@
 <th><a href="{% url 'dataset:images' dataset=dataset.id %}?order={% if ordering.0 == 'rerun' and ordering.1 == 'ASC' %}-{% endif %}rerun">Frequency (MHz.)</a></th>
 <th><a href="{% url 'dataset:images' dataset=dataset.id %}?order={% if ordering.0 == 'process_ts' and ordering.1 == 'ASC' %}-{% endif %}process_ts">Bandwidth (MHz.)</a></th>
 <th>Number of sources in image</th>
+    <th><a href="{% url 'dataset:images' dataset=dataset.id %}?order={% if ordering.0 == 'reject' and ordering.1 == 'ASC' %}-{% endif %}reject">Quality Rejection</a></th>
 </tr>
 </thead>
 <tbody>
@@ -28,6 +29,7 @@
 <td>{{ image.frequency|prefixformat:"M"|stringformat:".3f" }}</td>
 <td>{{ image.bandwidth|prefixformat:"M"|stringformat:".3f"  }}</td>
 <td>{{ image.ntotalsources }}</td>
+<td>{{ image.reject }}</td>
 </tr>
 {% endfor %}
 </tbody>

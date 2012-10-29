@@ -107,6 +107,7 @@ WHERE ex.image = im.id and im.dataset = %s"""
 
                 - ntotalsources: total number of sources (found by
                   sourcefinder) for this image.
+                - reject: if the image was rejected, the reason
 
                 Note that a tuple or list of strings is valid input, but
                 will be transformed into a set, to filter out double
@@ -163,6 +164,14 @@ SELECT * FROM image WHERE id = %s""", id)
 SELECT COUNT(*) FROM extractedsource WHERE image = %s"""
                 images[-1]['ntotalsources'] = self.db.getone(
                     query, images[-1]['id'])[0]
+            if 'reject' in extra_info:
+                query = "select description, comment " \
+                        "from rejection, rejectreason " \
+                        "where rejection.rejectreason = rejectreason.id and image=%s"
+                result = self.db.getone(query, images[-1]['id'])
+                if result:
+                    reason = ": ".join(result)
+                    images[-1]['reject'] = reason
         return images
 
 
