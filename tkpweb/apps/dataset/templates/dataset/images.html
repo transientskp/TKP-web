@@ -21,7 +21,12 @@
 </thead>
 <tbody>
 {% for image in images %}
-<tr class="{% cycle 'odd' 'even' %}">
+   {% if image.reject %}
+        <tr class="reject">
+   {%  else %}
+        <tr class="{% cycle 'odd' 'even' %}">
+   {%  endif %}
+
 <td><a href="{% url 'dataset:image' dataset=dataset.id id=image.id %}">{{ image.id }}</a></td>
 <td>{% if image.ra and image.dec %}{{ image.ra|stringformat:".3f" }}, {{ image.dec|stringformat:".3f" }}{% else %}-{% endif %}</td>
 <td>{{ image.obsstart|date:"c" }}</td>
