@@ -16,11 +16,17 @@
 <th><a href="{% url 'dataset:images' dataset=dataset.id %}?order={% if ordering.0 == 'rerun' and ordering.1 == 'ASC' %}-{% endif %}rerun">Frequency (MHz.)</a></th>
 <th><a href="{% url 'dataset:images' dataset=dataset.id %}?order={% if ordering.0 == 'process_ts' and ordering.1 == 'ASC' %}-{% endif %}process_ts">Bandwidth (MHz.)</a></th>
 <th>Number of sources in image</th>
+    <th><a href="{% url 'dataset:images' dataset=dataset.id %}?order={% if ordering.0 == 'reject' and ordering.1 == 'ASC' %}-{% endif %}reject">Quality Rejection</a></th>
 </tr>
 </thead>
 <tbody>
 {% for image in images %}
-<tr class="{% cycle 'odd' 'even' %}">
+   {% if image.reject %}
+        <tr class="reject">
+   {%  else %}
+        <tr class="{% cycle 'odd' 'even' %}">
+   {%  endif %}
+
 <td><a href="{% url 'dataset:image' dataset=dataset.id id=image.id %}">{{ image.id }}</a></td>
 <td>{% if image.ra and image.dec %}{{ image.ra|stringformat:".3f" }}, {{ image.dec|stringformat:".3f" }}{% else %}-{% endif %}</td>
 <td>{{ image.obsstart|date:"c" }}</td>
@@ -28,6 +34,7 @@
 <td>{{ image.frequency|prefixformat:"M"|stringformat:".3f" }}</td>
 <td>{{ image.bandwidth|prefixformat:"M"|stringformat:".3f"  }}</td>
 <td>{{ image.ntotalsources }}</td>
+<td>{{ image.reject }}</td>
 </tr>
 {% endfor %}
 </tbody>

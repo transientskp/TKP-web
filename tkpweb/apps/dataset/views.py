@@ -76,7 +76,7 @@ class ImagesView(BaseView):
 
     def get_context_data(self, **kwargs):
         context = super(ImagesView, self).get_context_data(**kwargs)
-        context['images'] = self.database.image(dataset=kwargs['dataset'], extra_info=['ntotalsources'])
+        context['images'] = self.database.image(dataset=kwargs['dataset'], extra_info=['ntotalsources', 'reject'])
         context['dataset'] = self.database.dataset(id=kwargs['dataset'])[0]
         return context
 
