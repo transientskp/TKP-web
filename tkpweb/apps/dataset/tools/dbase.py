@@ -270,7 +270,6 @@ SELECT COUNT(*) FROM extractedsource WHERE image = %s"""
 
         description = dict(
             [(d[0], i) for i, d in enumerate(self.db.cursor.description)])
-        print "description:",description
         transients = []
         for row in self.db.cursor.fetchall():
             transients.append(
