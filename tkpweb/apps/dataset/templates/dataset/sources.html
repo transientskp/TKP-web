@@ -15,7 +15,6 @@
 </tr>
 </thead>
 <tbody>
-<tbody>
 {% for source in sources %}
 <tr class="{% cycle 'odd' 'even' %}">
 <td><a href="{% url 'dataset:source' dataset=dataset.id runcat=source.runcat %}">{{ source.runcat }}</a></td>
