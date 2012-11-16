@@ -32,10 +32,10 @@ def plot_rms_distance_from_fieldcentre(
                                             + (ex.y - rc.y) * (ex.y - rc.y)
                                             + (ex.z - rc.z) * (ex.z - rc.z)
                                             ) / 2)) AS centr_img_dist_deg
-                ,CASE WHEN ex.det_sigma < 1e-6
-                    THEN 0.0
-                    ELSE 20000 * ex.f_peak / ex.det_sigma
-                 END as rms_mJy
+                ,COALESCE (
+                    CASE WHEN det_sigma < 1e-6 THEN 0.0 END,
+                    CASE WHEN det_sigma >= 1e-6 THEN 20000 * ex.f_peak / ex.det_sigma END
+                 ) as rms_mJy
             FROM extractedsource ex
                 ,image im
                 ,runningcatalog rc
@@ -84,9 +84,9 @@ class HistSourcesPerImagePlot(Plot):
             for rect in rects:
                 height = rect.get_height()
                 print height
-                axes.text(rect.get_x()+rect.get_width()/2., 1.05*height, int(height),
+                axes.text(rect.get_x() + rect.get_width() / 2., 1.05 * height, int(height),
                          rotation='horizontal', ha='center', va='bottom')
-                axes.text(rect.get_x()+rect.get_width()/2., 0.05*height, taustart[i].isoformat(),
+                axes.text(rect.get_x() + rect.get_width() / 2., 0.05 * height, taustart[i].isoformat(),
                          rotation='vertical', ha='center', va='bottom')
                 i += 1
 
@@ -112,30 +112,30 @@ WHERE t1.image = id
         taustart_ts = results[1]
         nsources = results[2]
 
-        axes = self.figure.add_subplot(1, 1, 1)    
+        axes = self.figure.add_subplot(1, 1, 1)
         width = 0.8
         ind = numpy.arange(len(imageid))
         rects = axes.bar(ind, nsources, width, color='r')
         axes.set_xlabel(r'Image')
         axes.set_ylabel(r'Number of Sources')
-        axes.set_xticks(ind + width/2.)
+        axes.set_xticks(ind + width / 2.)
         axes.set_xticklabels(imageid)
         autolabel(axes, rects, taustart_ts)
         axes.grid(True)
-    
+
 
 class ScatterPosAllCounterpartsPlot(Plot):
 
     def plot(self, database, dsid):
         """Plot positions of all counterparts for all (unique) sources for
         the given dataset.
-    
+
         The positions of all (unique) sources in the running catalog are
         at the centre, whereas the positions of all their associated
         sources are scattered around the central point.  Axes are in
         arcsec relative to the running catalog position.
         """
-    
+
         query = """\
 SELECT x.id
       ,x.ra
@@ -143,7 +143,7 @@ SELECT x.id
       ,3600 * (x.ra - r.wm_ra) as ra_dist_arcsec
       ,3600 * (x.decl - r.wm_decl) as decl_dist_arcsec
       ,x.ra_err/2
-      ,x.decl_err/2 
+      ,x.decl_err/2
       ,r.wm_ra_err/2
       ,r.wm_decl_err/2
   FROM assocxtrsource a
@@ -157,7 +157,7 @@ SELECT x.id
 
 """
         results = zip(*database.db.get(query, dsid))
-    
+
         if not results:
             return None
         xtrsrc_id = results[0]
@@ -169,16 +169,16 @@ SELECT x.id
         decl_err = results[6]
         wm_ra_err = results[7]
         wm_decl_err = results[8]
-    
+
         axes = self.figure.add_subplot(1, 1, 1)
         axes.errorbar(ra_dist_arcsec, decl_dist_arcsec, xerr=ra_err, yerr=decl_err,
-                      fmt='+',  color='b', label="xtr")
+                      fmt='+', color='b', label="xtr")
         axes.set_xlabel(r'RA (arcsec)')
         axes.set_ylabel(r'DEC (arcsec)')
         lim = 1 + max(int(numpy.trunc(max(abs(min(ra_dist_arcsec)),
                                           abs(max(ra_dist_arcsec))))),
                       int(numpy.trunc(max(abs(min(decl_dist_arcsec)),
                                           abs(max(decl_dist_arcsec))))))
-        axes.set_xlim(xmin=-lim, xmax=lim)
-        axes.set_ylim(ymin=-lim, ymax=lim)
+        axes.set_xlim(xmin= -lim, xmax=lim)
+        axes.set_ylim(ymin= -lim, ymax=lim)
         axes.grid(False)
