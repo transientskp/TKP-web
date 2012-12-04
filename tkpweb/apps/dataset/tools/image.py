@@ -1,8 +1,8 @@
 import os
 from tkp.database import DataBase
 from tkp.utility.accessors import DataAccessor
-from tkp.utility.accessors import FITSImage
-from tkp.utility.accessors import CASAImage
+from tkp.utility.accessors import FitsImage
+from tkp.utility.accessors import CasaImage
 
 from tkpweb.settings import MONGODB
 if MONGODB["enabled"]:
