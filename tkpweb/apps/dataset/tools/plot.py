@@ -99,12 +99,12 @@ class ThumbnailPlot(Plot):
         try:
             if os.path.isdir(filename):
                 # Likely a CASA image
-                image = accessors.CASAImage(filename)
+                image = accessors.CasaImage(filename)
             elif os.path.exists(filename):
-                image = accessors.FITSImage(filename)
+                image = accessors.FitsImage(filename)
             elif MONGODB["enabled"]:
                 hdu = fetch_hdu_from_mongo(filename)
-                image = accessors.FITSImage(hdu)
+                image = accessors.FitsImage(hdu)
             else:
                 raise Exception("Image file not available")
         except Exception, e:
