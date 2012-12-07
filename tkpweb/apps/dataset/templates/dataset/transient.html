@@ -5,7 +5,6 @@
 {% block main %}
 <h1>Transient #{{ transient.id }}</h1>
 
-
 <h2>Properties</h2>
 
 <table class="properties">
@@ -53,10 +52,11 @@
 
 {% if lightcurve %}
 <h2>Lightcurve</h2>
-
 {% if lightcurve.plot %}<figure><figcaption>Light curve for this transient; horizontal error bars indicate the integration time. Red bars indicate the timestamps of all available images; their width again indicates the image integration time for the image.</figcaption><img src="{{ lightcurve.plot }}" /></figure>{% endif %}
-<div id="lightcurve">
+
 {% if lightcurve.data %}
+<div id="lightcurve">
+<a href="?format=csv">csv format</a>
 <table style="float: left;">
 <thead>
 <th>ID</th>

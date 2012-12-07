@@ -1,0 +1,7 @@
+{% for source in sources %}
+    {{ source.id }},
+    {% if source.runcat %}{{ source.runcat }}{% else %}-{% endif %},
+    {{ source.ra|stringformat:".3f" }},
+    {{ source.decl|stringformat:".3f" }},
+    {% if source.userentry %}&#x2713;{% else %}-{% endif %}<br>
+{% endfor %}

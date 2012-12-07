@@ -1,0 +1,14 @@
+{% load formatting %}
+{% for extractedsource in extractedsources %}
+    {{ extractedsource.id }},
+    {% if extractedsource.runcat %}{{ extractedsource.runcat }}{% else %}None{% endif %},
+    {{ extractedsource.ra|stringformat:".3f" }},
+    {{ extractedsource.decl|stringformat:".3f" }},
+    {{ extractedsource.ra_err|stringformat:".3f" }},
+    {{ extractedsource.decl_err|stringformat:".3f" }},
+    {{ extractedsource.det_sigma|stringformat:".3f" }},
+    {{ extractedsource.f_peak|prefixformat:"m"|stringformat:".3f" }},
+    {{ extractedsource.f_peak_err|prefixformat:"m"|stringformat:".3f" }},
+    {{ extractedsource.f_int|prefixformat:"m"|stringformat:".3f" }},
+    {{ extractedsource.f_int_err|prefixformat:"m"|stringformat:".3f" }}<br>
+{% endfor %}

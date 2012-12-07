@@ -1,0 +1,14 @@
+{% load formatting %}
+{% for transient in transients %}
+    {{ transient.id }},
+    {{ transient.wm_ra|stringformat:".3f" }},
+    {{ transient.wm_decl|stringformat:".3f" }},
+    {% if transient.startdate %}{{ transient.startdate|date:"c" }}{% else %}-{% endif %},
+    {{ transient.siglevel|stringformat:".3f" }},
+    {{ transient.band }},
+    {{ transient.freq_eff|prefixformat:"M"|stringformat:".3f" }},
+    {{ transient.eta_int|stringformat:".2f" }},
+    {{ transient.v_int|stringformat:".4f" }},
+    {{ transient.npoints }},
+    {{ transient.runcat }}<br>
+{% endfor %}

@@ -1,0 +1,7 @@
+{% for dataset in datasets %}
+    {{ dataset.id }},
+    {{ dataset.description }},
+    {{ dataset.rerun }},
+    {{ dataset.process_ts|date:"c" }},
+    {{ dataset.ntransients }}<br>
+{% endfor %}
