@@ -1,0 +1,9 @@
+{% for source in sources %}
+    {{ source.runcat }},
+    {{ source.wm_ra|stringformat:".3f" }},
+    {{ source.wm_decl|stringformat:".3f" }},
+    {{ source.wm_ra_err|stringformat:".3f" }},
+    {{ source.wm_decl_err|stringformat:".3f"}},
+    {{ source.datapoints }}<br>
+{% endfor %}
+

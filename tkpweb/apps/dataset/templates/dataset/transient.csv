@@ -1,0 +1,8 @@
+{% load formatting %}
+{% for point in lightcurve.data %}
+    {{ point.4 }},
+    {{ point.0|date:"c" }},
+    {{ point.1 }},
+    {{ point.2|prefixformat:"m"|stringformat:".3f" }},
+    {{ point.3|prefixformat:"m"|stringformat:".3f" }} <br>
+{% endfor %}

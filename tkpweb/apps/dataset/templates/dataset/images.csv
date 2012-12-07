@@ -1,0 +1,11 @@
+{% load formatting %}
+{% for image in images %}
+    {{ image.id }},
+    {% if image.ra and image.dec %}{{ image.ra|stringformat:".3f" }}, {{ image.dec|stringformat:".3f" }}{% else %}-{% endif %},
+    {{ image.obsstart|date:"c" }},
+    {{ image.inttime }},
+    {{ image.frequency|prefixformat:"M"|stringformat:".3f" }},
+    {{ image.bandwidth|prefixformat:"M"|stringformat:".3f"  }},
+    {{ image.ntotalsources }},
+    {{ image.reject }}<br>
+{% endfor %}

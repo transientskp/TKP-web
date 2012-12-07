@@ -34,25 +34,29 @@ class BaseView(TemplateView):
         except AttributeError:
             return dbase.DataBase(dblogin=dblogin)
 
+    def set_template(self, name):
+        format = self.request.GET.get('format', 'html')
+        if not format in ['html', 'csv']:
+            raise Http404
+        self.template_name = "dataset/%s.%s" % (name, format)
+
 
 class DatasetsView(BaseView):
-    template_name = "dataset/datasets.html"
-
     def get_context_data(self, **kwargs):
         """List all available datasets, together with a bit of
         extra information"""
         context = super(DatasetsView, self).get_context_data(**kwargs)
+        self.set_template('datasets')
         context['datasets'] = self.database.dataset(extra_info=["ntransients"])
         return context
 
 
 class DatasetView(BaseView):
-    template_name = "dataset/dataset.html"
-
     def get_context_data(self, **kwargs):
         """List details for single dataset"""
 
         context = super(DatasetView, self).get_context_data(**kwargs)
+        self.set_template('dataset')
         dsid = int(kwargs['id'])
         dataset = self.database.dataset(id=dsid, extra_info=[
             "ntransients", "nimages", "nsources", "ntotalsources"])
@@ -72,20 +76,18 @@ class DatasetView(BaseView):
 
 
 class ImagesView(BaseView):
-    template_name = "dataset/images.html"
-
     def get_context_data(self, **kwargs):
         context = super(ImagesView, self).get_context_data(**kwargs)
+        self.set_template('images')
         context['images'] = self.database.image(dataset=kwargs['dataset'], extra_info=['ntotalsources', 'reject'])
         context['dataset'] = self.database.dataset(id=kwargs['dataset'])[0]
         return context
 
 
 class ImageView(BaseView):
-    template_name = "dataset/image.html"
-
     def get_context_data(self, **kwargs):
         context = super(ImageView, self).get_context_data(**kwargs)
+        self.set_template('image')
         image = self.database.image(id=kwargs['id'], dataset=kwargs['dataset'], extra_info=['ntotalsources'])
         if not image:
             raise Http404
@@ -105,11 +107,9 @@ class ImageView(BaseView):
 
 
 class TransientsView(BaseView):
-    template_name = "dataset/transients.html"
-
-
-    def get_context_data(self, **kwargs):
+    def get_context_data(self,  **kwargs):
         context = super(TransientsView, self).get_context_data(**kwargs)
+        self.set_template('transients')
         dataset = kwargs['dataset']
         try:
             context['dataset'] = self.database.dataset(id=dataset)[0]
@@ -120,10 +120,9 @@ class TransientsView(BaseView):
 
 
 class TransientView(BaseView):
-    template_name = "dataset/transient.html"
-
     def get_context_data(self, **kwargs):
         context = super(TransientView, self).get_context_data(**kwargs)
+        self.set_template('transient')
         id = kwargs['id']
         dataset = kwargs['dataset']
         transient = self.database.transient(id=id, dataset=dataset)
@@ -151,20 +150,18 @@ class TransientView(BaseView):
 
 
 class SourcesView(BaseView):
-    template_name = "dataset/sources.html"
-
     def get_context_data(self, **kwargs):
         context = super(SourcesView, self).get_context_data(**kwargs)
+        self.set_template('sources')
         context['sources'] = self.database.source(dataset=kwargs['dataset'])
         context['dataset'] = self.database.dataset(id=kwargs['dataset'])[0]
         return context
 
 
 class SourceView(BaseView):
-    template_name = "dataset/source.html"
-
     def get_context_data(self, **kwargs):
         context = super(SourceView, self).get_context_data(**kwargs)
+        self.set_template('source')
         source = self.database.source(runcat=kwargs['runcat'], dataset=kwargs['dataset'])
         if not source:
             raise Http404
@@ -182,20 +179,18 @@ class SourceView(BaseView):
 
 
 class ExtractedSourcesView(BaseView):
-    template_name = "dataset/extractedsources.html"
-
     def get_context_data(self, **kwargs):
         context = super(ExtractedSourcesView, self).get_context_data(**kwargs)
+        self.set_template('extractedsources')
         context['extractedsources'] = self.database.extractedsource(dataset=kwargs['dataset'])
         context['dataset'] = self.database.dataset(id=kwargs['dataset'])[0]
         return context
 
 
 class ExtractedSourceView(BaseView):
-    template_name = "dataset/extractedsource.html"
-
     def get_context_data(self, **kwargs):
         context = super(ExtractedSourceView, self).get_context_data(**kwargs)
+        self.set_template('extractedsource')
         extractedsource = self.database.extractedsource(id=kwargs['id'], dataset=kwargs['dataset'])
         if not extractedsource:
             raise Http404
@@ -207,7 +202,7 @@ class ExtractedSourceView(BaseView):
 
 
 class MonitoringListView(BaseView, FormMixin):
-    template_name = 'dataset/monitoringlist.html'
+    form_class = MonitoringListForm
     form_class = MonitoringListForm
     initial = {}
 
@@ -250,6 +245,7 @@ class MonitoringListView(BaseView, FormMixin):
 
     def get_context_data(self, **kwargs):
         context = super(MonitoringListView, self).get_context_data(**kwargs)
+        self.set_template('monitoringlist')
         context['sources'] = self.database.monitoringlist(dataset=kwargs['dataset'])
         context['dataset'] = self.database.dataset(id=kwargs['dataset'])[0]
         context['form'] = kwargs['form']

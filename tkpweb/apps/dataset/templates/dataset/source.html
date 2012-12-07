@@ -3,7 +3,6 @@
 {% block main %}
 <h1>Source #{{ source.id }}</h1>
 
-
 <h2>Properties</h2>
 
 <table class="properties">
@@ -28,6 +27,7 @@
 
 {% if lightcurve.plot %}<figure><figcaption>Light curve for this transient; horizontal error bars indicate the integration time. Red bars indicate the timestamps of all available images; their width again indicates the image integration time for the image.</figcaption><img src="{{ lightcurve.plot }}" /></figure>{% endif %}
 {% if lightcurve.data %}
+<a href="?format=csv">csv format</a>
 <table>
 <thead>
 <th>ID</th>

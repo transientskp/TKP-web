@@ -2,7 +2,7 @@
 {% load url from future %}
 {% block main %}
 <h1>Monitoring list for Dataset # {{ dataset.id }}</h1>
-
+<a href="?format=csv">csv format</a>
 {% if request.user.is_authenticated and perms.monitoringlist.change_monitoringlist %}
 <form action="{% url 'dataset:monitoringlist' dataset=dataset.id %}" method="post">{% csrf_token %}
 {% endif %}
