@@ -1,4 +1,3 @@
-from django.views.generic import View
 from django.views.generic import TemplateView
 from django.views.generic.edit import FormMixin
 from django.core.urlresolvers import reverse
@@ -6,20 +5,10 @@ from django.http import Http404
 from django.http import HttpResponse
 from django.http import HttpResponseForbidden
 from django.http import HttpResponseRedirect
-from django.shortcuts import redirect
 from .tools import dbase
 from .tools import plot
 from .tools import quality
 from .forms import MonitoringListForm
-from tkp.database import DataBase
-
-import tkp.database.utils as tkpdbutils
-from tkp.classification.transient import Transient
-from tkp.classification.transient import Position
-from scipy.stats import chisqprob
-import numpy
-import datetime
-
 
 class BaseView(TemplateView):
 
@@ -107,7 +96,7 @@ class ImageView(BaseView):
 
 
 class TransientsView(BaseView):
-    def get_context_data(self,  **kwargs):
+    def get_context_data(self, **kwargs):
         context = super(TransientsView, self).get_context_data(**kwargs)
         self.set_template('transients')
         dataset = kwargs['dataset']
@@ -202,7 +191,6 @@ class ExtractedSourceView(BaseView):
 
 
 class MonitoringListView(BaseView, FormMixin):
-    form_class = MonitoringListForm
     form_class = MonitoringListForm
     initial = {}
 
