@@ -1,6 +1,6 @@
 from django import template
-
-
+from django.utils.safestring import mark_safe
+from tkp.utility.coordinates import (ratohms, dectodms)
 register = template.Library()
 
 
@@ -13,3 +13,17 @@ def prefixformat(value, arg):
     except Exception:
         pass
     return value
+
+@register.filter
+def format_angle(value, format_type):
+    if format_type == "time":
+        h, m, s = ratohms(value)
+        result = "%d:%d:%.1f" % (h, m, s)
+    if format_type == "dms":
+        d, m, s = dectodms(value)
+        if d > 0:
+            sign = '+'
+        else:
+            sign = '-'
+        result = "%s%d:%d:%.1f" % (sign, d, m, s)
+    return mark_safe(result)

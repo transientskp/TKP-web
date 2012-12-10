@@ -1,5 +1,6 @@
 {% extends "dataset/base.html" %}
 {% load url from future %}
+{% load formatting %}
 {% block main %}
 <h1>Sources for Dataset # {{ sources.0.dataset }}</h1>
 <a href="?format=csv">csv format</a>
@@ -7,10 +8,12 @@
 <thead>
 <tr>
 <th>Running cat. #</th>
-<th>Right Ascension (&deg;)</th>
-<th>Declination (&deg;)</th>
-<th>Error (RA) (&Prime;)</th>
-<th>Error (dec.) (&Prime;)</th>
+<th>R.A. (&deg;)</th>
+<th>Decl (&deg;)</th>
+<th>R.A. Error (&Prime;)</th>
+<th>Decl Error (&Prime;)</th>
+<th>R.A. (h:m:s.)</th>
+<th>Decl (d:m:s.)</th>
 <th># of data points</th>
 </tr>
 </thead>
@@ -22,6 +25,8 @@
 <td>{{ source.wm_decl|stringformat:".3f" }}</td>
 <td>{{ source.wm_ra_err|stringformat:".3f" }}</td>
 <td>{{ source.wm_decl_err|stringformat:".3f" }}</td>
+<td> {{source.wm_ra|format_angle:"time"}}</td>
+<td> {{source.wm_decl|format_angle:"dms"}}</td>
 <td>{{ source.datapoints }}</td>
 </tr>
 {% endfor %}

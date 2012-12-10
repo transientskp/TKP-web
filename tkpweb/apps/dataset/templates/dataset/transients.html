@@ -7,7 +7,8 @@
 <thead>
 <tr>
 <th>Transient #</th>
-<th>Position</th>
+<th>Position (&deg;)</th>
+<th>Position (h:m:s,d:m:s)</th>
 <th>Start date</th>
 <th>Significance level</th>
 <th>band</th>
@@ -25,6 +26,7 @@
 <tr class="{% cycle 'odd' 'even' %}">
 <td><a href="{% url 'dataset:transient' dataset=dataset.id id=transient.id %}">{{ transient.id }}</a></td>
 <td>{{ transient.wm_ra|stringformat:".3f" }}, {{ transient.wm_decl|stringformat:".3f" }}</td>
+<td>{{ transient.wm_ra|format_angle:"time"}}, {{ transient.wm_decl|format_angle:"dms" }}</td>
 <td>{% if transient.startdate %}{{ transient.startdate|date:"c" }}{% else %}-{% endif %}</td>
 <td>{{ transient.siglevel|stringformat:".3f" }}</td>
 <td>{{ transient.band }}</td>

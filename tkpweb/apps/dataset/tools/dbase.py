@@ -253,12 +253,12 @@ SELECT COUNT(*) FROM extractedsource WHERE image = %s"""
                           ,rc.wm_ra
                           ,rc.wm_ra_err
                           ,rc.wm_decl
-                          ,rc.wm_decl_err 
+                          ,rc.wm_decl_err
                       FROM runningcatalog as rc
                           ,transient t
                           ,extractedsource x
                           ,image i
-                     WHERE rc.dataset = %s 
+                     WHERE rc.dataset = %s
                        AND t.runcat = rc.id
                        AND t.trigger_xtrsrc = x.id
                        AND x.image = i.id
