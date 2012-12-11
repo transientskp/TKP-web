@@ -67,10 +67,10 @@ class ImagePlot(Plot):
 
     def plot(self, dbimage, scale=0.9, plotsources=None, database=None):
         try:
-            if os.path.exists(dbimage['url']):
-                hdu = pyfits.open(dbimage['url'], readonly=True)
-            elif MONGODB["enabled"]:
+            if MONGODB["enabled"]:
                 hdu = fetch_hdu_from_mongo(dbimage['url'])
+            elif os.path.exists(dbimage['url']):
+                hdu = pyfits.open(dbimage['url'], readonly=True)
             else:
                 raise Exception("FITS file not available")
         except Exception, e:
