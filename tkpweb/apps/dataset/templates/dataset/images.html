@@ -28,11 +28,11 @@
    {%  endif %}
 
 <td><a href="{% url 'dataset:image' dataset=dataset.id id=image.id %}">{{ image.id }}</a></td>
-<td>{% if image.ra and image.dec %}{{ image.ra|stringformat:".3f" }}, {{ image.dec|stringformat:".3f" }}{% else %}-{% endif %}</td>
-<td>{{ image.obsstart|date:"c" }}</td>
-<td>{{ image.inttime }}</td>
-<td>{{ image.frequency|prefixformat:"M"|stringformat:".3f" }}</td>
-<td>{{ image.bandwidth|prefixformat:"M"|stringformat:".3f"  }}</td>
+<td>{{ image.centre_ra|stringformat:".3f" }}, {{ image.centre_decl|stringformat:".3f" }}</td>
+<td>{{ image.taustart_ts|date:"c" }}</td>
+<td>{{ image.tau_time }}</td>
+<td>{{ image.freq_eff|prefixformat:"M"|stringformat:".3f" }}</td>
+<td>{{ image.freq_bw|prefixformat:"M"|stringformat:".3f"  }}</td>
 <td>{{ image.ntotalsources }}</td>
 <td>{{ image.reject }}</td>
 </tr>
