@@ -1,11 +1,11 @@
 {% load formatting %}
 {% for image in images %}
     {{ image.id }},
-    {% if image.ra and image.dec %}{{ image.ra|stringformat:".3f" }}, {{ image.dec|stringformat:".3f" }}{% else %}-{% endif %},
-    {{ image.obsstart|date:"c" }},
-    {{ image.inttime }},
-    {{ image.frequency|prefixformat:"M"|stringformat:".3f" }},
-    {{ image.bandwidth|prefixformat:"M"|stringformat:".3f"  }},
+    {% if image.centre_ra and image.centre_decl %}{{ image.centre_ra|stringformat:".3f" }}, {{ image.centre_decl|stringformat:".3f" }}{% else %}-{% endif %},
+    {{ image.taustart_ts|date:"c" }},
+    {{ image.tau_time }},
+    {{ image.freq_eff|prefixformat:"M"|stringformat:".3f" }},
+    {{ image.freq_bw|prefixformat:"M"|stringformat:".3f"  }},
     {{ image.ntotalsources }},
     {{ image.reject }}<br>
 {% endfor %}

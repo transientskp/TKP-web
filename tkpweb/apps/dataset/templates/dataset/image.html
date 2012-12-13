@@ -9,19 +9,19 @@
 <table class="properties">
   <tr>
     <th>Phase center</th>
-    <td>{% if image.ra and image.dec %}({{ image.ra|stringformat:".3f" }}, {{ image.dec|stringformat:".3f" }}){% else %}-{% endif %}</td>
+    <td>({{ image.centre_ra|stringformat:".3f" }}, {{ image.centre_decl|stringformat:".3f" }})</td>
   </tr>
   <tr>
     <th>Observation start</th>
-    <td>{{ image.obsstart|date:"c" }}</td>
+    <td>{{ image.taustart_ts|date:"c" }}</td>
   </tr>
   <tr>
     <th>Integration time</th>
-    <td>{{ image.inttime }}</td>
+    <td>{{ image.tau_time }}</td>
   </tr>
   <tr>
     <th>Frequency</th>
-    <td>{{ image.frequency|prefixformat:"M"|stringformat:".3f" }} MHz.</td>
+    <td>{{ image.freq_eff|prefixformat:"M"|stringformat:".3f" }} MHz.</td>
   </tr>
   <tr>
     <th>Bandwithh</th>

@@ -143,22 +143,7 @@ SELECT * FROM image WHERE id = %s""", id)
             images.append(
                 dict([(key, row[column])
                       for key, column in description.iteritems()]))
-            # Format into slightly nicer keys
-            for key1, key2 in zip(
-                ['id', 'taustart_ts', 'tau_time', 'freq_eff', 'freq_bw',
-                 'dataset'],
-                ['id', 'obsstart', 'inttime', 'frequency', 'bandwidth',
-                 'dataset']):
-                images[-1][key2] = images[-1][key1]
-            # Open image to obtain phase center
-            img = open_image(images[-1]['url'], database=self.db)
-            try:
-                header = img.get_header()
-                images[-1]['ra'] = header['phasera']
-                images[-1]['dec'] = header['phasedec']
-            except (KeyError, AttributeError):
-                images[-1]['ra'] = None
-                images[-1]['dec'] = None
+
             if 'ntotalsources' in extra_info:
                 query = """\
 SELECT COUNT(*) FROM extractedsource WHERE image = %s"""

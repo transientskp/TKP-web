@@ -137,7 +137,7 @@ class LightcurvePlot(Plot):
 
     def plot(self, lc, T0=None, images=None, trigger_index=None):
         times = numpy.array([time.mktime(point[0].timetuple()) for point in lc])
-        inttimes = [point[1]/2. for point in lc]
+        tau_times = [point[1]/2. for point in lc]
         fluxes = [point[2] for point in lc]
         errors = [point[3] for point in lc]
         if T0 is None:
@@ -152,7 +152,7 @@ class LightcurvePlot(Plot):
         tdiff = (tdiff.microseconds + (tdiff.seconds + tdiff.days * 86400) * 1e6) / 1e6
         times -= tdiff
         axes = self.figure.add_subplot(1, 1, 1)
-        axes.errorbar(x=times, y=fluxes, yerr=errors, xerr=numpy.array(inttimes)/2., fmt='bo')
+        axes.errorbar(x=times, y=fluxes, yerr=errors, xerr=numpy.array(tau_times)/2., fmt='bo')
         if trigger_index is not None:
             axes.errorbar(x=times[trigger_index], y=fluxes[trigger_index], fmt='o', mec='r', ms=15., mfc='None')
         ylimits = axes.get_ylim()
