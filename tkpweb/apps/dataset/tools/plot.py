@@ -6,18 +6,18 @@ import time
 import numpy
 import aplpy
 import pyfits
-from scipy.stats import scoreatpercentile
-import matplotlib
+import math
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 from matplotlib.patches import Rectangle
 from matplotlib.collections import PatchCollection
 from tkp.utility import accessors
-import dbase
+
 
 from tkpweb.settings import MONGODB
 if MONGODB["enabled"]:
     from .mongo import fetch_hdu_from_mongo
+
 
 class Plot(object):
 
@@ -140,6 +140,18 @@ class LightcurvePlot(Plot):
         tau_times = [point[1]/2. for point in lc]
         fluxes = [point[2] for point in lc]
         errors = [point[3] for point in lc]
+        bands = [point[5] for point in lc]
+        stokes = [point[6] for point in lc]
+
+        # create a unique color code mapping for band ID
+        unique = list(set(bands))
+        colors = 'bgrcmykw'
+        if len(unique) > len(colors):
+            # TODO: we need more colors :) for now just repeat
+            colors = int(math.ceil(len(unique)/float(len(colors))))*colors
+        color_indexes = [unique.index(x) for x in bands]
+        ecolor = [colors[x] for x in color_indexes]
+
         if T0 is None:
             tmin = sorted(times)[0]
             if images:
@@ -153,6 +165,7 @@ class LightcurvePlot(Plot):
         times -= tdiff
         axes = self.figure.add_subplot(1, 1, 1)
         axes.errorbar(x=times, y=fluxes, yerr=errors, xerr=numpy.array(tau_times)/2., fmt='bo')
+        axes.scatter(x=times, y=fluxes, color=ecolor, zorder=100)
         if trigger_index is not None:
             axes.errorbar(x=times[trigger_index], y=fluxes[trigger_index], fmt='o', mec='r', ms=15., mfc='None')
         ylimits = axes.get_ylim()
