@@ -146,11 +146,8 @@ class LightcurvePlot(Plot):
         # create a unique color code mapping for band ID
         unique = list(set(bands))
         colors = 'bgrcmykw'
-        if len(unique) > len(colors):
-            # TODO: we need more colors :) for now just repeat
-            colors = int(math.ceil(len(unique)/float(len(colors))))*colors
         color_indexes = [unique.index(x) for x in bands]
-        ecolor = [colors[x] for x in color_indexes]
+        ecolor = [colors[x % len(colors)] for x in color_indexes]
 
         if T0 is None:
             tmin = sorted(times)[0]
