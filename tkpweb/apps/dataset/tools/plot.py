@@ -163,6 +163,11 @@ class LightcurvePlot(Plot):
         axes = self.figure.add_subplot(1, 1, 1)
         axes.errorbar(x=times, y=fluxes, yerr=errors, xerr=numpy.array(tau_times)/2., fmt='bo')
         axes.scatter(x=times, y=fluxes, color=ecolor, zorder=100)
+        legend_elements = []
+        for e in unique:
+            color = colors[unique.index(e) % len(colors)]
+            legend_elements.append(Rectangle((0, 0), 1, 1, fc=color))
+        axes.legend(legend_elements, bands, loc='best')
         if trigger_index is not None:
             axes.errorbar(x=times[trigger_index], y=fluxes[trigger_index], fmt='o', mec='r', ms=15., mfc='None')
         ylimits = axes.get_ylim()
