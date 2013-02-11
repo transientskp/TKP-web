@@ -124,18 +124,30 @@ WHERE ex.image = im.id and im.dataset = %s"""
         """
 
         extra_info = set(extra_info)
+        basic_query = """SELECT im.*
+                              ,sky.centre_ra
+                              ,sky.centre_decl
+                         FROM image im
+                             ,skyregion sky
+                         WHERE sky.id = im.skyrgn """
         if id is not None:  # id = 0 could be valid for some databases
             if dataset is not None:
-                self.db.execute("""\
-SELECT * FROM image WHERE id = %s AND dataset = %s""", id, dataset)
+                extra_clauses = """AND im.id = %(imgid)s 
+                                   AND im.dataset = %(dsid)s"""
+                self.db.cursor.execute(basic_query + extra_clauses,
+                                {'imgid':id, 'dsid':dataset})
             else:
-                self.db.execute("""\
-SELECT * FROM image WHERE id = %s""", id)
+                extra_clauses = """AND im.id = %(imgid)s """
+                self.db.cursor.execute(basic_query + extra_clauses,
+                                {'imgid':id})
         else:
             if dataset is not None:
-                self.db.execute("""SELECT * FROM image WHERE dataset = %s""", dataset)
+                extra_clauses = """AND im.dataset = %(dsid)s"""
+                self.db.cursor.execute(basic_query + extra_clauses,
+                                {'dsid':dataset})
             else:
-                self.db.execute("""SELECT * FROM image""")
+                self.db.cursor.execute(basic_query)
+
         description = dict(
             [(d[0], i) for i, d in enumerate(self.db.cursor.description)])
         images = []
