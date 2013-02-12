@@ -142,6 +142,7 @@ class LightcurvePlot(Plot):
         errors = [point[3] for point in lc]
         bands = [point[5] for point in lc]
         stokes = [point[6] for point in lc]
+        bandnames = ["%.1f MHz" % (point[7] / 1e6,) for point in lc]
 
         # create a unique color code mapping for band ID
         unique = list(set(bands))
@@ -167,7 +168,7 @@ class LightcurvePlot(Plot):
         for e in unique:
             color = colors[unique.index(e) % len(colors)]
             legend_elements.append(Rectangle((0, 0), 1, 1, fc=color))
-        axes.legend(legend_elements, bands, loc='best')
+        axes.legend(legend_elements, bandnames, loc='best')
         if trigger_index is not None:
             axes.errorbar(x=times[trigger_index], y=fluxes[trigger_index], fmt='o', mec='r', ms=15., mfc='None')
         ylimits = axes.get_ylim()
