@@ -43,7 +43,7 @@ class DataBaseView(TemplateView):
             for line in output.split('\n'):
                 try:
                     name, status = line.split()[:2]
-                    if status == 'running':
+                    if status in ("running", "R"):
                         context['databases']['<server2>']['names'].append(name)
                 except ValueError:
                     pass
