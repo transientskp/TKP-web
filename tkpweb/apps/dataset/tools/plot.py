@@ -144,11 +144,18 @@ class LightcurvePlot(Plot):
         stokes = [point[6] for point in lc]
         bandnames = ["%.1f MHz" % (point[7] / 1e6,) for point in lc]
 
-        # create a unique color code mapping for band ID
-        unique = list(set(bands))
+        # colors to use for band labeling.
         colors = 'bgrcmykw'
-        color_indexes = [unique.index(x) for x in bands]
-        ecolor = [colors[x % len(colors)] for x in color_indexes]
+
+        # This makes a mapping from band ID to (color, name)
+        unique_bands = list(set(zip(bands, bandnames)))
+        mapping_list = []
+        for index, (band,name) in enumerate(unique_bands):
+            color = colors[index % len(colors)]
+            mapping_list.append((band, (color, name)))
+        mapping = dict(mapping_list)
+
+        ecolor = [mapping[x][0] for x in bands]
 
         if T0 is None:
             tmin = sorted(times)[0]
@@ -164,11 +171,13 @@ class LightcurvePlot(Plot):
         axes = self.figure.add_subplot(1, 1, 1)
         axes.errorbar(x=times, y=fluxes, yerr=errors, xerr=numpy.array(tau_times)/2., fmt='bo')
         axes.scatter(x=times, y=fluxes, color=ecolor, zorder=100)
-        legend_elements = []
-        for e in unique:
-            color = colors[unique.index(e) % len(colors)]
-            legend_elements.append(Rectangle((0, 0), 1, 1, fc=color))
-        axes.legend(legend_elements, bandnames, loc='best')
+
+        # construct legend
+        sorted_mapping = sorted(mapping.values(), key=lambda x: x[1])
+        band_colors, band_names = zip(*sorted_mapping)
+        legend_elements = [Rectangle((0, 0), 1, 1, fc=c) for c in band_colors]
+        axes.legend(legend_elements, band_names, loc='best')
+
         if trigger_index is not None:
             axes.errorbar(x=times[trigger_index], y=fluxes[trigger_index], fmt='o', mec='r', ms=15., mfc='None')
         ylimits = axes.get_ylim()
