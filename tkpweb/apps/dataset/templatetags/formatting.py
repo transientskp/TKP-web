@@ -2,6 +2,7 @@ from django import template
 from django.utils.safestring import mark_safe
 from tkp.utility.coordinates import (ratohms, dectodms)
 register = template.Library()
+import os
 
 
 @register.filter
@@ -27,3 +28,8 @@ def format_angle(value, format_type):
             sign = '-'
         result = "%s%d:%d:%.1f" % (sign, d, m, s)
     return mark_safe(result)
+
+@register.filter
+def basename_format(value):
+    """Returns just the basename from a URL"""
+    return os.path.basename(value)
