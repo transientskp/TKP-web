@@ -220,7 +220,8 @@ SELECT COUNT(*) FROM extractedsource WHERE image = %s"""
                        AND t.runcat = rc.id
                        AND t.trigger_xtrsrc = x.id
                        AND x.image = i.id
-                    """, id, dataset)
+                       AND i.dataset = %s
+                    """, id, dataset, dataset)
             else:
                 self.db.execute("""\
                     SELECT transient.*
@@ -259,7 +260,8 @@ SELECT COUNT(*) FROM extractedsource WHERE image = %s"""
                        AND t.runcat = rc.id
                        AND t.trigger_xtrsrc = x.id
                        AND x.image = i.id
-                    """, dataset)
+                       AND i.dataset = %s
+                    """, dataset, dataset)
             else:
                 self.db.execute("""\
                     SELECT transient.*
