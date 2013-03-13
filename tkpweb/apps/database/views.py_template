@@ -38,15 +38,13 @@ class DataBaseView(TemplateView):
         try:
             output = subprocess.Popen(
                 ['<monetdb-executable-2>', '-h', '<server2>',
-                 '-p', '<port2>', '-P', '<server2-password>', 'status'],
+                 '-p', '<port2>', '-P', '<server2-password>', 'status', '-l', '-s', 'r'],
                 stdout=subprocess.PIPE).communicate()[0]
             for line in output.split('\n'):
-                try:
-                    name, status = line.split()[:2]
-                    if status in ("running", "R"):
-                        context['databases']['<server2>']['names'].append(name)
-                except ValueError:
-                    pass
+                if not line or line[0] == " ":
+                    continue
+                else:
+                    context['databases']['<server2>']['names'].append(line[:-1])
         except subprocess.CalledProcessError:
             pass
         # Set and get the current database
