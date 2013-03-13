@@ -80,6 +80,10 @@ class HistSourcesPerImagePlot(Plot):
 
     def plot(self, database, dsid):
         def autolabel(axes, rects, taustart):
+            # Call this to label each rectangle in the historgram with its
+            # height and the image start time.
+            # Does not scale to large numbers of images: the plot becomes
+            # unreadable.
             i = 0
             for rect in rects:
                 height = rect.get_height()
@@ -118,9 +122,6 @@ WHERE t1.image = id
         rects = axes.bar(ind, nsources, width, color='r')
         axes.set_xlabel(r'Image')
         axes.set_ylabel(r'Number of Sources')
-        axes.set_xticks(ind + width / 2.)
-        axes.set_xticklabels(imageid)
-        autolabel(axes, rects, taustart_ts)
         axes.grid(True)
 
 
@@ -182,3 +183,5 @@ SELECT x.id
         axes.set_xlim(xmin= -lim, xmax=lim)
         axes.set_ylim(ymin= -lim, ymax=lim)
         axes.grid(False)
+        # Shifts plot spacing to ensure that axes labels are displayed
+        self.figure.tight_layout()
