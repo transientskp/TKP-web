@@ -31,10 +31,11 @@
 <table>
 <thead>
 <th>ID</th>
-<th>Date (UTC)</ht>
-<th>Integration time (s)</ht>
-<th>Flux (mJy)</ht>
-<th>Flux error (mJy)</ht>
+<th>Date (UTC)</th>
+<th>Integration time (s)</th>
+<th>Frequency (MHz)</th>
+<th>Flux (mJy)</th>
+<th>Flux error (mJy)</th>
 </thead>
 <tbody>
 {% for point in lightcurve.data %}
@@ -42,6 +43,7 @@
 <td><a href="{% url 'dataset:extractedsource' dataset=dataset.id id=point.4 %}">{{ point.4 }}</a></td>
 <td>{{ point.0|date:"c" }}</td>
 <td>{{ point.1 }}</td>
+<td>{{ point.7|prefixformat:"M"|stringformat:".1f" }}</td>
 <td>{{ point.2|prefixformat:"m"|stringformat:".3f" }}</td>
 <td>{{ point.3|prefixformat:"m"|stringformat:".3f" }}</td>
 </tr>
