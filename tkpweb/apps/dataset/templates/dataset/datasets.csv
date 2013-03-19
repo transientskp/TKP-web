@@ -3,5 +3,6 @@
     {{ dataset.description }},
     {{ dataset.rerun }},
     {{ dataset.process_ts|date:"c" }},
+    {{ dataset.nimages }},
     {{ dataset.ntransients }}<br>
 {% endfor %}
