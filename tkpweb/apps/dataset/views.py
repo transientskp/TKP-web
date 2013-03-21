@@ -36,7 +36,9 @@ class DatasetsView(BaseView):
         extra information"""
         context = super(DatasetsView, self).get_context_data(**kwargs)
         self.set_template('datasets')
-        context['datasets'] = self.database.dataset(extra_info=["ntransients"])
+        context['datasets'] = self.database.dataset(
+            extra_info=["ntransients", "nimages"]
+        )
         return context
 
 

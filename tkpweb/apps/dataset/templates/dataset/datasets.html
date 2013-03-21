@@ -8,9 +8,10 @@
 <tr>
 <th><a href="{% url 'dataset:datasets' %}?order={% if ordering.0 == 'id' and ordering.1 == 'ASC' %}-{% endif %}id">id</a></th>
 <!-- <th><a href="{% url 'dataset:datasets' %}?order={% if ordering.0 == 'type' and ordering.1 == 'ASC' %}-{% endif %}type">type</a></th> -->
-<th><a href="{% url 'dataset:datasets' %}?order={% if ordering.0 == 'description' and ordering.1 == 'ASC' %}-{% endif %}description">description</a></th>
+<th><a href="{% url 'dataset:datasets' %}?order={% if ordering.0 == 'description' and ordering.1 == 'ASC' %}-{% endif %}description">Description</a></th>
 <th><a href="{% url 'dataset:datasets' %}?order={% if ordering.0 == 'rerun' and ordering.1 == 'ASC' %}-{% endif %}rerun">Reprocessing step #</a></th>
 <th><a href="{% url 'dataset:datasets' %}?order={% if ordering.0 == 'process_ts' and ordering.1 == 'ASC' %}-{% endif %}process_ts">Processing finished</a></th>
+<th>Number of images</th>
 <th>Number of transients</th>
 </tr>
 </thead>
@@ -22,6 +23,7 @@
 <td>{{ dataset.description }}</td>
 <td>{{ dataset.rerun }}</td>
 <td>{{ dataset.process_ts|date:"c" }}</td>
+<td>{{ dataset.nimages }}</td>
 <td>{{ dataset.ntransients }}</td>
 </tr>
 {% endfor %}
