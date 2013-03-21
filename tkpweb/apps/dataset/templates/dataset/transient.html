@@ -62,6 +62,7 @@
 <th>ID</th>
 <th>Date (UTC)</th>
 <th>Integration time (s)</th>
+<th>Frequency (MHz)</th>
 <th>Flux (mJy)</th>
 <th>Flux error (mJy)</th>
 <th>Thumbnail</th>
@@ -72,6 +73,7 @@
 <td><a href="{% url 'dataset:extractedsource' dataset=dataset.id id=point.4 %}">{{ point.4 }}</a></td>
 <td>{{ point.0|date:"c" }}</td>
 <td>{{ point.1 }}</td>
+<td>{{ point.7|prefixformat:"M"|stringformat:".1f" }}</td>
 <td>{{ point.2|prefixformat:"m"|stringformat:".3f" }}</td>
 <td>{{ point.3|prefixformat:"m"|stringformat:".3f" }}</td>
 <td><img src="{{ lightcurve.thumbnails|index:forloop.counter0 }}" height="20" class="thumbnail" number="{{ forloop.counter0 }}" /></td>
