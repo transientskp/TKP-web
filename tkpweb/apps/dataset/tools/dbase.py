@@ -252,16 +252,24 @@ SELECT COUNT(*) FROM extractedsource WHERE image = %s"""
                           ,rc.wm_ra_err
                           ,rc.wm_decl
                           ,rc.wm_decl_err
+                          ,npt.npoints
                       FROM runningcatalog as rc
                           ,transient t
                           ,extractedsource x
                           ,image i
+                          ,(SELECT a.runcat as id, COUNT(a.runcat) as npoints
+                            FROM assocxtrsource a
+                                ,runningcatalog rc
+                            WHERE rc.dataset = %s
+                              AND a.runcat = rc.id
+                            GROUP BY a.runcat) as npt
                      WHERE rc.dataset = %s
                        AND t.runcat = rc.id
                        AND t.trigger_xtrsrc = x.id
                        AND x.image = i.id
                        AND i.dataset = %s
-                    """, dataset, dataset)
+                       AND npt.id = rc.id
+                    """, dataset, dataset, dataset)
             else:
                 self.db.execute("""\
                     SELECT transient.*
@@ -279,21 +287,21 @@ SELECT COUNT(*) FROM extractedsource WHERE image = %s"""
         description = dict(
             [(d[0], i) for i, d in enumerate(self.db.cursor.description)])
         transients = []
-        for row in self.db.cursor.fetchall():
+        rows = self.db.cursor.fetchall()
+        for row in rows:
             transients.append(
                 dict([(key, row[column])
                       for key, column in description.iteritems()]))
-            # Format into somewhat nicer keys
-            #for key1, key2 in zip(
-            #    ['id', 't_start'],
-            #    ['id', 'startdate']):
-            #    transients[-1][key2] = transients[-1][key1]
             # Obtain the actual number of datapoints, including those from
             # sub-detection level monitoring observations
-            transients[-1]['npoints'] = self.db.getone(
-                "SELECT COUNT(*) FROM assocxtrsource WHERE runcat = %s",
-                transients[-1]['runcat'])[0]
-            
+            # This is already done in one of the queries above: here, we
+            # handle the other cases.
+            # TODO: Shift this into the above queries.
+            if not "npoints" in transients[-1]:
+                transients[-1]['npoints'] = self.db.getone(
+                    "SELECT COUNT(*) FROM assocxtrsource WHERE runcat = %s",
+                    transients[-1]['runcat'])[0]
+
             # TODO: FEEDBACK: Why is the siglevel recalculated. This was
             # already done and stored in the transient table
             # Calculate the significance level (note: here we do need rc.datapoints,
