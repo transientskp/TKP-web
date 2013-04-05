@@ -5,4 +5,6 @@ name =
 user = 
 password = 
 port = 
-autocommit = False
+# For read-only queries autocommit must be switched to on.
+# Do not change it.
+autocommit = True
