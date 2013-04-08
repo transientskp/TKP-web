@@ -1,4 +1,4 @@
-import os.path
+import os
 import StringIO
 import base64
 import datetime
@@ -17,6 +17,7 @@ from tkp.utility import accessors
 from tkpweb.settings import MONGODB
 if MONGODB["enabled"]:
     from .mongo import fetch_hdu_from_mongo
+    from .mongo import fetch_file_from_mongo
 
 
 class Plot(object):
@@ -103,8 +104,8 @@ class ThumbnailPlot(Plot):
             elif os.path.exists(filename):
                 image = accessors.FitsImage(filename)
             elif MONGODB["enabled"]:
-                hdu = fetch_hdu_from_mongo(filename)
-                image = accessors.FitsImage(hdu)
+                fits = fetch_file_from_mongo(filename)
+                image = accessors.FitsImage(fits)
             else:
                 raise Exception("Image file not available")
         except Exception, e:
@@ -131,6 +132,10 @@ class ThumbnailPlot(Plot):
         if thumbnail.any():
             axes.imshow(thumbnail)
             self.figure.subplots_adjust(bottom=0, left=0, top=1, right=1)
+
+        # If we created a temporary file, better clean it up
+        if "fits" in locals():
+            os.unlink(fits)
 
 
 class LightcurvePlot(Plot):
