@@ -61,7 +61,7 @@ class DataBaseView(TemplateView):
                 'name': name,
                 'password': name,
                 'user': name,
-                'port': int(port)
+                'port': int(port),
                 'autocommit': True
                 }
         else:
@@ -73,7 +73,7 @@ class DataBaseView(TemplateView):
                     'name': config['database']['name'],
                     'password': config['database']['password'],
                     'user': config['database']['user'],
-                    'port': config['database']['port']
+                    'port': config['database']['port'],
                     'autocommit': config['database']['autocommit']
                     }
         self.request.session['dblogin'] = dblogin
