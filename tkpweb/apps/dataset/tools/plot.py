@@ -98,14 +98,14 @@ class ThumbnailPlot(Plot):
     def plot(self, filename, position, boxsize=(40, 40)):
         # Guess the file format from the extension
         try:
-            if os.path.isdir(filename):
+            if MONGODB["enabled"]:
+                fits = fetch_file_from_mongo(filename)
+                image = accessors.FitsImage(fits)
+            elif os.path.isdir(filename):
                 # Likely a CASA image
                 image = accessors.CasaImage(filename)
             elif os.path.exists(filename):
                 image = accessors.FitsImage(filename)
-            elif MONGODB["enabled"]:
-                fits = fetch_file_from_mongo(filename)
-                image = accessors.FitsImage(fits)
             else:
                 raise Exception("Image file not available")
         except Exception, e:
