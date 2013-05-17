@@ -76,7 +76,12 @@
 <td>{{ point.7|prefixformat:"M"|stringformat:".1f" }}</td>
 <td>{{ point.2|prefixformat:"m"|stringformat:".3f" }}</td>
 <td>{{ point.3|prefixformat:"m"|stringformat:".3f" }}</td>
-<td><img src="{{ lightcurve.thumbnails|index:forloop.counter0 }}" height="20" class="thumbnail" number="{{ forloop.counter0 }}" /></td>
+<td>
+	<img src="{{ lightcurve.thumbnails|index:forloop.counter0 }}" height="20" 
+		class="thumbnail" number="{{ forloop.counter0 }}"
+		clicked="0" 
+		/>
+</td>
 </tr>
 {% endfor %}
 </tbody>
