@@ -1,7 +1,7 @@
 {% load formatting %}
 {% for extractedsource in extractedsources %}
     {{ extractedsource.id }},
-    {% if extractedsource.runcat %}{{ extractedsource.runcat }}{% else %}None{% endif %},
+    {{ extractedsource.runcat }},
     {{ extractedsource.ra|stringformat:".3f" }},
     {{ extractedsource.decl|stringformat:".3f" }},
     {{ extractedsource.ra_err|stringformat:".3f" }},

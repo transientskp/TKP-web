@@ -1,7 +1,8 @@
 {% load formatting %}
 {% for image in images %}
     {{ image.id }},
-    {% if image.centre_ra and image.centre_decl %}{{ image.centre_ra|stringformat:".3f" }}, {{ image.centre_decl|stringformat:".3f" }}{% else %}-{% endif %},
+    {{ image.centre_ra|stringformat:".3f" }},
+    {{ image.centre_decl|stringformat:".3f" }},
     {{ image.taustart_ts|date:"c" }},
     {{ image.tau_time }},
     {{ image.freq_eff|prefixformat:"M"|stringformat:".3f" }},
