@@ -1,4 +1,5 @@
 {% extends "dataset/base.html" %}
+{% load url from future %}
 {% block main %}
 <h1>Available databases</h1>
 
@@ -6,7 +7,13 @@
 {% for host, settings in databases.items %}
 <li>{{ host }}<ul>
 {% for database in settings.names %}
-<li>{% if host == selected.0 and database == selected.2 %}{{ database }} (current){% else %}<a href="{% url database:database-port host settings.port database %}">{{ database }}</a>{% endif %}</li>
+<li>
+  {% if host == selected.0 and database == selected.2 %}
+    {{ database }} (current)
+  {% else %}
+    <a href="{% url "database:database-port" host settings.port database %}">{{ database }}</a>
+  {% endif %}
+</li>
 {% endfor %}
 </ul></li>
 {% endfor %}
